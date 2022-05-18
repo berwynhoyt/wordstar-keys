@@ -1,0 +1,11 @@
+#!/bin/bash
+# install script to install wordstar keys
+# Dependencies: you must be running X Windows on Linux using xkb (typical for Ubuntu, Mint, etc.)
+
+mkdir -p ~/.xkb/symbols
+cp wordstar ~/.xkb/symbols
+mkdir -p ~/bin
+cp wskeys ~/bin
+
+# append to this user's .profile if it's not there, so that it gets automatically loaded at login
+#grep -q "~/bin/wskeys" ~/.profile || printf "\n~/bin/wskeys\n" >>~/.profile
