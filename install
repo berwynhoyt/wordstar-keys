@@ -2,10 +2,17 @@
 # install script to install wordstar keys
 # Dependencies: you must be running X Windows on Linux using xkb (typical for Ubuntu, Mint, etc.)
 
+# Unless symlinks already exists, install wordstar keys into users local config
+# The symlink is left in case you have pointed it right here into a git working copy
 mkdir -p ~/.xkb/symbols
-cp wordstar ~/.xkb/symbols
-mkdir -p ~/bin
-cp wskeys ~/bin
+mkdir -p ~/.local/bin
+[[ ! -L ~/.xkb/symbols/wordstar ]] && cp wordstar ~/.xkb/symbols
+[[ ! -L ~/.local/bin/wskeys ]] && cp wskeys ~/.local/bin
 
-# append to this user's .profile if it's not there, so that it gets automatically loaded at login
-#grep -q "~/bin/wskeys" ~/.profile || printf "\n~/bin/wskeys\n" >>~/.profile
+# append wskeys to this user's .profile if it's not there, so that it gets automatically loaded at login
+grep -q "/wskeys$" ~/.profile || printf "\n# Load wordstar cursor control keys\n~/.local/bin/wskeys\n" >>~/.profile
+if [[ "$PATH" != *"$HOME/.local/bin"* ]]; then
+    echo "wskeys has been added to $HOME/.local/bin, so if you want to run 'wskeys' then"
+    echo "you need to add ~/.local/bin to your PATH, or on some Linux distributions"
+    echo "your default ~/.profile may automatically do so on next login."
+fi
