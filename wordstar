@@ -1,3 +1,56 @@
+// Define wordstar cursor control keys
+// e.g. Ctrl-Q followed by S or D for left/right; E or X for up/down
+
+partial modifier_keys alphanumeric_keys
+xkb_symbols "keys" {
+  include "wordstar(caps_key)"
+  include "wordstar(qkeys)"
+};
+
+// Wordstar keys with caps-q prefix
+// Note: key <AD02> is the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab)
+partial modifier_keys alphanumeric_keys
+xkb_symbols "qkeys" {
+  include "wordstar(level5_enable)"  // includes clode below
+  key.type[Group1] = "FOUR_LEVEL";
+  // Note, the following can be implemented with ISO_Group_Latch instead of ISO_Level5_Latch
+  // and then changing all the the definition tables below to have a second set of square brackets that covers prefix keyed actions
+  // e.g. { [NoSymbol, NoSymbol, Left], [End] };
+  // This would work, but if there are two layouts loaded (e.g. English and Greek) 
+  // then we'd clobber Greek which would be loaded as group 2
+  key <AD01> { [ NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch ] };
+
+  key.type[Group1] = "EIGHT_LEVEL";
+  key <AD02> { [ NoSymbol, NoSymbol, Pointer_Button4, Pointer_Button4 ] };
+  key <AD03> { [ NoSymbol, NoSymbol, Up ] };
+  key <AD04> { [ NoSymbol, NoSymbol, Prior ] };
+  key <AC01> { [ NoSymbol, NoSymbol, Left ] };
+  key <AC02> { [ NoSymbol, NoSymbol, Left, Left, NoSymbol, NoSymbol, Home ]  };
+  key <AC03> { [ NoSymbol, NoSymbol, Right, Right, NoSymbol, NoSymbol, End ] };
+  key <AC04> { [ NoSymbol, NoSymbol, Right ] };
+  key <AC05> { [ NoSymbol, NoSymbol, Delete ] };
+  key <AB01> { [ NoSymbol, NoSymbol, Pointer_Button5 ] };
+  key <AB02> { [ NoSymbol, NoSymbol, Down ] };
+  key <AB03> { [ NoSymbol, NoSymbol, Next ] };
+};
+
+// Assign an actual keysym to ISO_Level5_Shift
+// Otherwise Ctrl-Q key prefixes don't work. Don't know why.
+// For some reason this is necessary to make ISO_Level5_Latch also work (i.e. our Ctrl-Q prefix)
+// This code is stolen from 'include "level5(modifier_mapping)"', but using that defines the <MDSW> key instead
+// and then the compiler complains that "<MDSW> is added to map for multiple modifiers"
+// and it ignores one of the definitions, making this flakey.
+// If you don't want <RCTL> as a level 5 shift, specify a less common key like <I153>
+// see /usr/share/X11/xkb/keycodes/evdev for key definitions like <I153>
+partial modifier_keys
+xkb_symbols "level5_enable" {
+  replace key <I153> {
+    type[Group1] = "ONE_LEVEL",
+    symbols[Group1] = [ ISO_Level5_Shift ]
+  };
+  modifier_map Mod3 { <I153> };
+};
+
 // caps_mod4: make capslock generate the mod4 modifier
 partial modifier_keys
 xkb_symbols "caps_key" {
@@ -8,12 +61,15 @@ xkb_symbols "caps_key" {
   include "level3(modifier_mapping)"
 };
 
-// Wordstar keys with caps-q prefix
-partial modifier_keys alphanumeric_keys
-xkb_symbols "qkeys" {
-    key.type[Group1] = "FOUR_LEVEL";
-	key <AC02> { [ NoSymbol, NoSymbol, Right, Left ] };
-	key <AC03> { [ NoSymbol, NoSymbol, Right, Right ] };
-	key <AD03> { [ NoSymbol, NoSymbol, Up, Up ] };
-	key <AB02> { [ NoSymbol, NoSymbol, Down, Down ] };
+default partial xkb_compatibility "mousekeys" {
+  // Keypad actions.
+  interpret.repeat= True;
+  interpret WheelUp {
+      action = PointerButton(button=4);
+  };
+  interpret WheelDown {
+      action = PointerButton(button=5);
+  };
+  key <AD02> { [ NoSymbol, NoSymbol, WheelUp, WheelUp ] };
+  key <AB01> { [ NoSymbol, NoSymbol, WheelDown, WheelDown ] };
 };
