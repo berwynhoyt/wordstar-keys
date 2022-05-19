@@ -1,0 +1,26 @@
+default partial xkb_compatibility "redirects" {
+    interpret Shift_Lock {
+        action = LockMods(modifiers=Shift);
+    };
+    interpret ISO_Level2_Latch {
+        action= LatchMods(modifiers=Shift,clearLocks,latchToLock);
+    };
+    interpret 0xfd15 {
+        action= LatchMods(modifiers=Shift,clearLocks,latchToLock);
+        action = RedirectKey(keycode=<AB03>, clearModifiers=AltGr+Shift, modifiers=Control);
+    };
+    interpret Find {
+        action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr, modifiers=Control);
+    };
+};
+
+default partial xkb_compatibility "mousekeys" {
+  // Keypad actions.
+  interpret.repeat= True;
+  interpret Pointer_Button4 {
+      action = PointerButton(button=4);
+  };
+  interpret Pointer_Button5 {
+      action = PointerButton(button=5);
+  };
+};

@@ -12,26 +12,29 @@ xkb_symbols "keys" {
 partial modifier_keys alphanumeric_keys
 xkb_symbols "qkeys" {
   include "wordstar(level5_enable)"  // includes clode below
-  key.type[Group1] = "FOUR_LEVEL";
-  // Note, the following can be implemented with ISO_Group_Latch instead of ISO_Level5_Latch
+
+  // Note, the following Q key prefix can be implemented with ISO_Group_Latch instead of ISO_Level5_Latch
   // and then changing all the the definition tables below to have a second set of square brackets that covers prefix keyed actions
   // e.g. { [NoSymbol, NoSymbol, Left], [End] };
   // This would work, but if there are two layouts loaded (e.g. English and Greek) 
   // then we'd clobber Greek which would be loaded as group 2
-  key <AD01> { [ NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch ] };
-
-  key.type[Group1] = "EIGHT_LEVEL";
-  key <AD02> { [ NoSymbol, NoSymbol, Pointer_Button4, Pointer_Button4 ] };
-  key <AD03> { [ NoSymbol, NoSymbol, Up ] };
-  key <AD04> { [ NoSymbol, NoSymbol, Prior ] };
-  key <AC01> { [ NoSymbol, NoSymbol, Left ] };
-  key <AC02> { [ NoSymbol, NoSymbol, Left, Left, NoSymbol, NoSymbol, Home ]  };
-  key <AC03> { [ NoSymbol, NoSymbol, Right, Right, NoSymbol, NoSymbol, End ] };
-  key <AC04> { [ NoSymbol, NoSymbol, Right ] };
-  key <AC05> { [ NoSymbol, NoSymbol, Delete ] };
-  key <AB01> { [ NoSymbol, NoSymbol, Pointer_Button5 ] };
-  key <AB02> { [ NoSymbol, NoSymbol, Down ] };
-  key <AB03> { [ NoSymbol, NoSymbol, Next ] };
+  key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
+  key <AD01> { [ NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch ] }; // Q
+  key <AD02> { [ NoSymbol, NoSymbol, Pointer_Button4 ] }; // W
+  key <AD03> { [ NoSymbol, NoSymbol, Up, Up, Up, Up, Up, Up ], [Up, Up] };  // E
+  key <AD04> { [ NoSymbol, NoSymbol, Prior, Prior ], [Prior, Prior] }; // R
+  key <AC01> { [ NoSymbol, NoSymbol, Left, Left ], [Left, Left] };  // A
+  key <AC02> { [ NoSymbol, NoSymbol, Left, Left, NoSymbol, NoSymbol, Home ] , [Left, Left] }; // S
+  key <AC03> { [ NoSymbol, NoSymbol, Right, Right, Up, Up, End ], [0xfd15, 0xfd15] };  // D
+  key <AC04> { [ NoSymbol, NoSymbol, Right, Right, NoSymbol, NoSymbol, Find ], [Right, Right]  };  // F
+  key <AC05> { [ NoSymbol, NoSymbol, Delete, Delete ] };  // G
+  key <AC06> { [ NoSymbol, NoSymbol, BackSpace, BackSpace ], [ Shift_L, Shift_L ] };  // H
+  key <AC08> { [ NoSymbol, NoSymbol, ISO_Group_Latch, ISO_Group_Latch ], [ Shift_Lock, Shift_Lock ] }; // K
+  key <AC09> { [ NoSymbol, NoSymbol, F3, F3 ] };       // L - repeat find
+  key <AB01> { [ NoSymbol, NoSymbol, Pointer_Button5 ] }; // Z
+  key <AB02> { [ NoSymbol, NoSymbol, Down, Down ], [Down, Down] };  // X
+  key <AB03> { [ NoSymbol, NoSymbol, Next, Next ], [Next, Next] };  // C
+  key <AB06> { [ NoSymbol, NoSymbol, Return ] };  // N
 };
 
 // Assign an actual keysym to ISO_Level5_Shift
@@ -40,7 +43,8 @@ xkb_symbols "qkeys" {
 // This code is stolen from 'include "level5(modifier_mapping)"', but using that defines the <MDSW> key instead
 // and then the compiler complains that "<MDSW> is added to map for multiple modifiers"
 // and it ignores one of the definitions, making this flakey.
-// If you don't want <RCTL> as a level 5 shift, specify a less common key like <I153>
+// I've chosen key <I153> because it's unlikely to be used (defined as KEY_SENDFILE in evdev)
+// If you want a real key, say <RCTL> as a level 5 shift, specify it instead.
 // see /usr/share/X11/xkb/keycodes/evdev for key definitions like <I153>
 partial modifier_keys
 xkb_symbols "level5_enable" {
@@ -51,7 +55,7 @@ xkb_symbols "level5_enable" {
   modifier_map Mod3 { <I153> };
 };
 
-// caps_mod4: make capslock generate the mod4 modifier
+// Make capslock generate the level3 modifier
 partial modifier_keys
 xkb_symbols "caps_key" {
   key <CAPS> {
