@@ -1,58 +1,78 @@
-// Define wordstar cursor control keys
-// e.g. Ctrl-Q followed by S or D for left/right; E or X for up/down
+// Define Wordstar cursor control keys using capslock as the 'control' shift key
+// e.g. ^S/^D moves left/right; ^E/^X moves up/down; ^A/^F word left/right; ^R/^C moves page Up/Down
+// and ^Q acts as a prefix, e.g. ^QS/^QD moves to Home/End of line; ^QR/^QC start/end of document
+// ^QF is find; ^L is re-find; ^QA is replace
+// ^KK locks the shift key on so you can select a block; ^KH releases it.
+// ^KC block_cut; ^KP block_paste; ^KD block_duplicate (if block is on only)
+// ^KS block_save; ^KD block_save (if block not on)
+// ^KQ quit doc without saving; ^KX save and close
 
+// X Keyboard file format is poorly documented in many places. I found the following to be most useful:
+//   https://www.charvolant.org/doug/xkb/html/xkb.html
+//   https://wiki.archlinux.org/title/X_keyboard_extension
+
+// Main import: wordstar(keys)
 partial modifier_keys alphanumeric_keys
 xkb_symbols "keys" {
+  // when 'keys' invoked, include sub-sections from same file below
   include "wordstar(caps_key)"
-  include "wordstar(qkeys)"
+  include "wordstar(main)"
 };
 
-// Wordstar keys with caps-q prefix
+// Wordstar keys with caps-q prefix and caps-k prefix
 // Note: key <AD02> is the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab)
 partial modifier_keys alphanumeric_keys
-xkb_symbols "qkeys" {
+xkb_symbols "main" {
   include "wordstar(level5_enable)"  // includes clode below
 
-  // Note, the following Q key prefix can be implemented with ISO_Group_Latch instead of ISO_Level5_Latch
-  // and then changing all the the definition tables below to have a second set of square brackets that covers prefix keyed actions
-  // e.g. { [NoSymbol, NoSymbol, Left], [End] };
-  // This would work, but if there are two layouts loaded (e.g. English and Greek) 
-  // then we'd clobber Greek which would be loaded as group 2
-  key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
-  key <AD01> { [ NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch ] }; // Q
-  key <AD02> { [ NoSymbol, NoSymbol, Pointer_Button4 ] }; // W
-  key <AD03> { [ NoSymbol, NoSymbol, Up, Up, Up, Up, Up, Up ], [Up, Up] };  // E
-  key <AD04> { [ NoSymbol, NoSymbol, Prior, Prior ], [Prior, Prior] }; // R
-  key <AC01> { [ NoSymbol, NoSymbol, Left, Left ], [Left, Left] };  // A
-  key <AC02> { [ NoSymbol, NoSymbol, Left, Left, NoSymbol, NoSymbol, Home ] , [Left, Left] }; // S
-  key <AC03> { [ NoSymbol, NoSymbol, Right, Right, Up, Up, End ], [0xfd15, 0xfd15] };  // D
-  key <AC04> { [ NoSymbol, NoSymbol, Right, Right, NoSymbol, NoSymbol, Find ], [Right, Right]  };  // F
-  key <AC05> { [ NoSymbol, NoSymbol, Delete, Delete ] };  // G
-  key <AC06> { [ NoSymbol, NoSymbol, BackSpace, BackSpace ], [ Shift_L, Shift_L ] };  // H
-  key <AC08> { [ NoSymbol, NoSymbol, ISO_Group_Latch, ISO_Group_Latch ], [ Shift_Lock, Shift_Lock ] }; // K
-  key <AC09> { [ NoSymbol, NoSymbol, F3, F3 ] };       // L - repeat find
-  key <AB01> { [ NoSymbol, NoSymbol, Pointer_Button5 ] }; // Z
-  key <AB02> { [ NoSymbol, NoSymbol, Down, Down ], [Down, Down] };  // X
-  key <AB03> { [ NoSymbol, NoSymbol, Next, Next ], [Next, Next] };  // C
-  key <AB06> { [ NoSymbol, NoSymbol, Return ] };  // N
-};
+  // Set responses for each key on the keyboard in various shift states. Columns as follows:
+  //   { [normal, shifted, caps'ed, caps+shift, ^Q-prefixed, ^Q-shifted, ^Q-caps'ed, ^Q-caps+shift], [^K-prefixed, ^K-shifted, ^K-caps'ed, ^K-caps+shift, ...] }
+  // where ^Q and ^K means the previous keypress was caps+Q or caps+K
+  // Empty cells or 'NoSymbol' cells in the table means leave that table entry as it was (the original key functionality).
+  // 'VoidSymbol' cells produce no key
 
-// Assign an actual keysym to ISO_Level5_Shift
-// Otherwise Ctrl-Q key prefixes don't work. Don't know why.
-// For some reason this is necessary to make ISO_Level5_Latch also work (i.e. our Ctrl-Q prefix)
-// This code is stolen from 'include "level5(modifier_mapping)"', but using that defines the <MDSW> key instead
-// and then the compiler complains that "<MDSW> is added to map for multiple modifiers"
-// and it ignores one of the definitions, making this flakey.
-// I've chosen key <I153> because it's unlikely to be used (defined as KEY_SENDFILE in evdev)
-// If you want a real key, say <RCTL> as a level 5 shift, specify it instead.
-// see /usr/share/X11/xkb/keycodes/evdev for key definitions like <I153>
-partial modifier_keys
-xkb_symbols "level5_enable" {
-  replace key <I153> {
-    type[Group1] = "ONE_LEVEL",
-    symbols[Group1] = [ ISO_Level5_Shift ]
-  };
-  modifier_map Mod3 { <I153> };
+  // This works by making capslock a "level3 shift" in xkb terminology which means it
+  // shifts 2 columns to the right in the table (i.e. moves from column 1 to 3).
+  // ^Q is a level5 'latch' which also moves the *next key* 2 columns right in the table.
+  // ^K is a "group latch" which moves the next key into group2 (i.e. the second set of square brackets)
+
+  // The drawback of this approach is that any level3 keys defined by the user are overwritten (.e.g AltGr+E producing euro).
+  // To avoid this, it could probably be implemented by changing capslock to level5 shift and then ^Q group 2 and ^K group 3
+  // This would leave AltGr as the only level-3 shift and move capslock to a level5 shift.
+
+  // Note1: the Fxx keys are unused function keys just to link the matching entry in the wscompat file
+  // so I can redirect to a different keyboard key. It just has to be a name that is defined in keysymdef.h
+
+  // Note2: it is necessary to fill all group2 [] entries with at least 4 columns if you want them to work properly (including
+  // overwriting vestigal AltGr chars) after ^KK/^KH because they turn shiftlock off but leave group2 latch on for another key.
+  // I can't fix this as there is no way to assign 2 actions (unshift & ungroup) to one key.
+  // But it does mean you must carefully spec group2 entries to work as follows:
+  //   group2[normal, shifted, caps'ed, caps+shift] after either ^K or after ^KK/^KH (remembering that ^KK turns on shiftlock)
+  // It also means I couldn't implement ^KQ/^KX (quit/close) lest they clobber ^Q-movement after ^KK
+
+  key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
+  key <AD01> { [NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch], [NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch] }; // ^Q=>prefix_key(Level5_Latch)
+  key <AD02> { [NoSymbol, NoSymbol, F26, F26] };  // ^W=>ctrl-Up=F26(scroll_up)
+  key <AD03> { [NoSymbol, NoSymbol, Up, Up], [NoSymbol, NoSymbol, Up, Up] };  // ^E=>Up
+  key <AD04> { [NoSymbol, NoSymbol, Page_Up, Page_Up, NoSymbol, NoSymbol, F32, F32], [NoSymbol, NoSymbol, F32, F32] }; // ^R=>Page_Up; ^QR=>ctrl-Home=F32
+  key <AD06> { [NoSymbol, NoSymbol, F28, F28] }; // ^Y=>shift-End=F28(delete_to_end_of_line but without final backspace press which I can't do)
+  key <AD10> { [NoSymbol, NoSymbol, NoSymbol, NoSymbol], [NoSymbol, NoSymbol, F25, F25] };  // ^KP=>F25(block_paste=paste)
+  key <AC01> { [NoSymbol, NoSymbol, F29, F29, NoSymbol, NoSymbol, F31, F31], [NoSymbol, NoSymbol, Left, Left] };  // ^A=>ctrl-Left=F29(word_left); ^QA=>ctrl-h=F31(search)
+  key <AC02> { [NoSymbol, NoSymbol, Left, Left, NoSymbol, NoSymbol, Home, Home], [NoSymbol, NoSymbol, F24, F24] }; // ^S=>Left; ^QS=>Home; ^KS=>ctrl-S(save)
+  key <AC03> { [NoSymbol, NoSymbol, Right, Right, NoSymbol, NoSymbol, End, End], [F35, F35, F24, F35] };  // ^D=>Right; ^QD=>End; ^KD(if block on)=>F35(block_duplicate); ^KD(if block off)=>F24(save)
+  key <AC04> { [NoSymbol, NoSymbol, F30, F30, NoSymbol, NoSymbol, Find, Find], [NoSymbol, NoSymbol, F30, F30]  };  // ^F=>ctrl-Right=F30; ^QF=>ctrl-F=Find
+  key <AC05> { [NoSymbol, NoSymbol, Delete, Delete], [NoSymbol, NoSymbol, Delete, Delete] };  // ^G
+  key <AC06> { [NoSymbol, NoSymbol, BackSpace, BackSpace], [Shift_L, Shift_L, Shift_L, Shift_L] };  // ^H=>Backspace; ^KH=>unblock (Shift_L performs un-shiftlock)
+  key <AC08> { [NoSymbol, NoSymbol, ISO_Group_Latch, ISO_Group_Latch], [Shift_Lock, Shift_Lock, Shift_Lock, Shift_Lock] }; // ^K=>prefix_key(Group_Latch); ^KK=>start_block
+  key <AC09> { [NoSymbol, NoSymbol, F3, F3] };  // ^L=>F3(repeat_find)
+  key <AB01> { [NoSymbol, NoSymbol, F27, F27] };  // ^Z=>ctrl-Down=F27(scroll_down)
+  key <AB02> { [NoSymbol, NoSymbol, Down, Down], [NoSymbol, NoSymbol, Down, Down] };  // ^X=>Down
+  key <AB03> { [NoSymbol, NoSymbol, Page_Down, Page_Down, NoSymbol, NoSymbol, F33, F33], [F34, F34, Page_Down, F34] };  // ^KC=>ctrl-x=F34(block_cut); ^QC->ctrl-End=F33
+  key <AB06> { [NoSymbol, NoSymbol, Return] };  // ^N=>insert_line
+  // Can't figure out how to implement:
+  //    insert line (^N) as Return+Left: only one key allowed
+  //    delete to end of line (^Y)
+  //    top/bottom of page (^QE/^QX)
 };
 
 // Make capslock generate the level3 modifier
@@ -60,20 +80,26 @@ partial modifier_keys
 xkb_symbols "caps_key" {
   key <CAPS> {
     type[Group1]="ONE_LEVEL",
-    symbols[Group1] = [ ISO_Level3_Shift ]
+    symbols[Group1] = [ISO_Level3_Shift]
   };
   include "level3(modifier_mapping)"
 };
 
-default partial xkb_compatibility "mousekeys" {
-  // Keypad actions.
-  interpret.repeat= True;
-  interpret WheelUp {
-      action = PointerButton(button=4);
+// Assign an actual keysym to ISO_Level5_Shift
+// Otherwise ^Q key prefixes don't work, even though they invoke ISO_Level5_shift.
+// Don't know why it needs a dedicated key.
+partial modifier_keys
+xkb_symbols "level5_enable" {
+  // This code is stolen from 'include "level5(modifier_mapping)"' but with different key. Instead of using the <MDSW> key
+  // (for which the compiler complains that "<MDSW> is added to map for multiple modifiers"
+  // and ignores one of the definitions, making operation flakey.)
+  // I've chosen key <I153> because it's unlikely to be used (defined as KEY_SENDFILE in evdev)
+  // If you want a real key, say <RCTL> as a level 5 shift, specify it instead.
+  // (But why would you want than when you have ^Q latch to do it?)
+  // see /usr/share/X11/xkb/keycodes/evdev for key definitions like <I153>
+  key <I153> {
+    type[Group1] = "ONE_LEVEL",
+    symbols[Group1] = [ISO_Level5_Shift]
   };
-  interpret WheelDown {
-      action = PointerButton(button=5);
-  };
-  key <AD02> { [ NoSymbol, NoSymbol, WheelUp, WheelUp ] };
-  key <AB01> { [ NoSymbol, NoSymbol, WheelDown, WheelDown ] };
+  modifier_map Mod3 { <I153> };
 };

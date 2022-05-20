@@ -1,26 +1,69 @@
-default partial xkb_compatibility "redirects" {
-    interpret Shift_Lock {
-        action = LockMods(modifiers=Shift);
-    };
-    interpret ISO_Level2_Latch {
-        action= LatchMods(modifiers=Shift,clearLocks,latchToLock);
-    };
-    interpret 0xfd15 {
-        action= LatchMods(modifiers=Shift,clearLocks,latchToLock);
-        action = RedirectKey(keycode=<AB03>, clearModifiers=AltGr+Shift, modifiers=Control);
-    };
-    interpret Find {
-        action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr, modifiers=Control);
-    };
-};
+// Define compat file for wordstar cursor controls
 
-default partial xkb_compatibility "mousekeys" {
-  // Keypad actions.
-  interpret.repeat= True;
-  interpret Pointer_Button4 {
-      action = PointerButton(button=4);
+default partial xkb_compatibility "redirects" {
+  interpret Shift_Lock {
+      action = LockMods(modifiers=Shift);
   };
-  interpret Pointer_Button5 {
-      action = PointerButton(button=5);
+
+  // Implement various key redirections that could not be done with bare keys
+  // Most of these are to send a key with control pressed, which is not possible with bare keys
+  interpret F26 {  // ^W ctrl-Up (scroll up)
+    action = RedirectKey(keycode=<UP>, clearModifiers=AltGr+Shift, modifiers=Control);
   };
+  interpret F27 {  // ^Z ctrl-Down (scroll down)
+    action = RedirectKey(keycode=<DOWN>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+
+  interpret F32 {  // ^QR ctrl-Home
+    action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+  interpret F33 {  // ^QC ctrl-End
+    action = RedirectKey(keycode=<END>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+
+  interpret F29 {  // ^A ctrl-Left (word left)
+    action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Control);
+  };
+  interpret F30 {  // ^F ctrl-Left (word right)
+    action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Control);
+  };
+
+  interpret Find {  // ^QF ctrl-f (find)
+    action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr, modifiers=Control);
+  };
+  interpret F31 {  // ^QA ctrl-h (replace)
+    action = RedirectKey(keycode=<AC06>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+
+  interpret F35 {  // ^KD ctrl-c (block copy)
+    action = RedirectKey(keycode=<AB03>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+  interpret F34 {  // ^KC ctrl-x (block cut)
+    action = RedirectKey(keycode=<AB02>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+  interpret F25 {  // ^KP ctrl-v (block paste=paste)
+    action = RedirectKey(keycode=<AB04>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+  interpret F24 {  // ^KS/^KD ctrl-s (save)
+    action = RedirectKey(keycode=<AC02>, clearModifiers=AltGr+Shift, modifiers=Control);
+  };
+
+  interpret F28 {  // ^Y shift-End (to be used as part of delete-to-end-of-line)
+    action = RedirectKey(keycode=<END>, clearModifiers=AltGr, modifiers=Shift);
+  };
+
+  interpret ISO_Group_Latch {
+    useModMapMods= level1;
+    action= LatchGroup(group=2);
+  };
+
+  // See if we can get keys to produce scroll wheel events.
+  // Not sure why this doesn't work. Leave it here to prove I've tried it.
+  // Instead, I've used ctrl+Up/Down for scroll as some editors scroll that way
+//~   interpret Pointer_Button4 {
+//~     action= PointerButton(button=4);
+//~   };
+//~   interpret Pointer_Button5 {
+//~     action= PointerButton(button=5);
+//~   };
 };

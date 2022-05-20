@@ -5,8 +5,10 @@
 # Unless symlinks already exists, install wordstar keys into users local config
 # The symlink is left in case you have pointed it right here into a git working copy
 mkdir -p ~/.xkb/symbols
+mkdir -p ~/.xkb/compat
 mkdir -p ~/.local/bin
 [[ ! -L ~/.xkb/symbols/wordstar ]] && cp wordstar ~/.xkb/symbols
+[[ ! -L ~/.xkb/symbols/wscompat ]] && cp wscompat ~/.xkb/compat
 [[ ! -L ~/.local/bin/wskeys ]] && cp wskeys ~/.local/bin
 
 # append wskeys to this user's .profile if it's not there, so that it gets automatically loaded at login
