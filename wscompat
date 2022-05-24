@@ -1,65 +1,89 @@
+#!xkb #specify_lexicon_for_editor_display_style
 // Define compat file for wordstar cursor controls
 
-default partial xkb_compatibility "redirects" {
-  interpret Shift_Lock {
-      action = LockMods(modifiers=Shift);
-  };
+default partial xkb_compatibility "default" {
+	include "wscompat(redirects)"
+};
 
-  // Implement various key redirections that could not be done with bare keys
-  // Most of these are to send a key with control pressed, which is not possible with bare keys
-  interpret F26 {  // ^W ctrl-Up (scroll up)
-    action = RedirectKey(keycode=<UP>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
-  interpret F27 {  // ^Z ctrl-Down (scroll down)
-    action = RedirectKey(keycode=<DOWN>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
+partial xkb_compatibility "redirects" {
+	interpret Shift_Lock {
+		action = LockMods(modifiers=Shift);
+	};
 
-  interpret F32 {  // ^QR ctrl-Home
-    action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
-  interpret F33 {  // ^QC ctrl-End
-    action = RedirectKey(keycode=<END>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
+	// Note3: keycodes are of the form <AD02> for the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab),
+	// and function keys are <FK0x>; the rest are found in /usr/share/X11/xkb/keycodes/evdev.
 
-  interpret F29 {  // ^A ctrl-Left (word left)
-    action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Control);
-  };
-  interpret F30 {  // ^F ctrl-Left (word right)
-    action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Control);
-  };
+	// Implement various key redirections that could not be done with bare keys.
+	// Most of these are to send a key with control pressed, which is not possible with bare keys.
+	interpret F26 {  // ^W ctrl-Up (scroll up)
+		action = RedirectKey(keycode=<UP>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret F27 {  // ^Z ctrl-Down (scroll down)
+		action = RedirectKey(keycode=<DOWN>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
 
-  interpret Find {  // ^QF ctrl-f (find)
-    action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr, modifiers=Control);
-  };
-  interpret F31 {  // ^QA ctrl-h (replace)
-    action = RedirectKey(keycode=<AC06>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
+	interpret F32 {  // ^QR ctrl-Home
+		action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret F33 {  // ^QC ctrl-End
+		action = RedirectKey(keycode=<END>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
 
-  interpret F35 {  // ^KD ctrl-c (block copy)
-    action = RedirectKey(keycode=<AB03>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
-  interpret F34 {  // ^KC ctrl-x (block cut)
-    action = RedirectKey(keycode=<AB02>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
-  interpret F25 {  // ^KP ctrl-v (block paste=paste)
-    action = RedirectKey(keycode=<AB04>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
-  interpret F24 {  // ^KS/^KD ctrl-s (save)
-    action = RedirectKey(keycode=<AC02>, clearModifiers=AltGr+Shift, modifiers=Control);
-  };
+	interpret F29 {  // ^A ctrl-Left (word left)
+		action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Control);
+	};
+	interpret F30 {  // ^F ctrl-Left (word right)
+		action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Control);
+	};
 
-  interpret F28 {  // ^Y shift-End (to be used as part of delete-to-end-of-line)
-    action = RedirectKey(keycode=<END>, clearModifiers=AltGr, modifiers=Shift);
-  };
+	interpret Find {  // ^QF ctrl-f (find)
+		action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr, modifiers=Control);
+	};
+	interpret F31 {  // ^QA ctrl-h (replace)
+		action = RedirectKey(keycode=<AC06>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
 
-  interpret ISO_Group_Latch {
-    useModMapMods= level1;
-    action= LatchGroup(group=2);
-  };
+	interpret F23 {  // ^KD ctrl-c (block copy)
+		action = RedirectKey(keycode=<AB03>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret F34 {  // ^KC ctrl-x (block cut)
+		action = RedirectKey(keycode=<AB02>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret F25 {  // ^KP ctrl-v (block paste=paste)
+		action = RedirectKey(keycode=<AB04>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret F24 {  // ^KS/^KD ctrl-s (save)
+		action = RedirectKey(keycode=<AC02>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
 
-  // See if we can get keys to produce scroll wheel events.
-  // Not sure why this doesn't work. Leave it here to prove I've tried it.
-  // Instead, I've used ctrl+Up/Down for scroll as some editors scroll that way
+	interpret F28 {  // ^Y ctrl-Shift-Delete (to be used as part of delete-to-end-of-line)
+		action = RedirectKey(keycode=<DELE>, clearModifiers=AltGr, modifiers=Shift+Control);
+	};
+
+	interpret F3 {  // ^L (repeat_find: remove AltGr modifier so it works even while caps held down)
+		action = RedirectKey(keycode=<FK03>, clearModifiers=AltGr+Shift);
+	};
+
+	interpret F35 {
+		action = RedirectKey(keycode=<RCTL>, clearModifiers=AltGr+Shift);
+	};
+
+	interpret ISO_Group_Latch {
+		useModMapMods = level1;
+		action= LatchGroup(group=2);
+	};
+
+//~ #Work out why the following is different than the above
+//~     virtual_modifiers  LevelThree,AltGr;
+//~ 	interpret F35 { // Same as ISO_Group_Latch but also unlatches shift if possible
+//~ 		virtualModifier= AltGr;
+//~ 		useModMapMods = level1;
+//~ 		action = LatchGroup(group=1, clearLocks);
+//~ 	};
+
+	// See if we can get keys to produce scroll wheel events.
+	// Not sure why this doesn't work. Leave it here to prove I've tried it.
+	// Instead, I've used ctrl+Up/Down for scroll as some editors scroll that way
 //~   interpret Pointer_Button4 {
 //~     action= PointerButton(button=4);
 //~   };

@@ -1,4 +1,13 @@
+#!xkb #specify_lexicon_for_editor_display_style
+
+// TODO:
+// Fix capslock sends a character, deleting spreadsheet cell: perhaps due to preserve thing I read from Ivan Pascal
+// Fix warnings
+// Try to fix ^K problem by:
+// 	ISOLock(modifiers=Lock, affect=all); https://web.archive.org/web/20030311155645/http://www.tsu.ru/~pascal/other/xkb/gram-action.html
+
 // Define Wordstar cursor control keys using capslock as the 'control' shift key
+//
 // e.g. ^S/^D moves left/right; ^E/^X moves up/down; ^A/^F word left/right; ^R/^C moves page Up/Down
 // and ^Q acts as a prefix, e.g. ^QS/^QD moves to Home/End of line; ^QR/^QC start/end of document
 // ^QF is find; ^L is re-find; ^QA is replace
@@ -7,82 +16,109 @@
 // ^KS block_save; ^KD block_save (if block not on)
 // ^KQ quit doc without saving; ^KX save and close
 
-// X Keyboard file format is poorly documented in many places. I found the following to be most useful:
+// Implementation quirks
+//
+// It really is a shame that xkb doesn't let me issue two keystrokes or I could do a lot better.
+// I can't figure out how to implement:
+//  ^Y (delete to end of line) issues ctrl-Shift-Delete which deletes to end of paragraph in a word processor
+//  ^N (insert line) issues <Enter> key. There is no way to issue a second Left key afterward to make it stay on the saame line like it should
+//  ^QE/^QX (top/bottom of page): there is no standard function to do this in linux
+//	^W/^Z (scroll up/down) issues ctrl-Up/Down which works in my editor but in few other apps.
+
+// X Keyboard file format is poorly documented in many places. I found the following to be most useful.
+// The first half of the first doc will help you understand this file:
+//   https://www.x.org/archive/X11R7.6/doc/xorg-docs/input/XKB-Enhancing.html
+//		(Note replacements for rotten links therein: https://web.archive.org/web/20021213091011/http://www.tsu.ru/~pascal/en/xkb/)
 //   https://www.charvolant.org/doug/xkb/html/xkb.html
 //   https://wiki.archlinux.org/title/X_keyboard_extension
 
 // Main import: wordstar(keys)
-partial modifier_keys alphanumeric_keys
+default partial modifier_keys alphanumeric_keys
 xkb_symbols "keys" {
-  // when 'keys' invoked, include sub-sections from same file below
-  include "wordstar(caps_key)"
-  include "wordstar(main)"
+	// when 'keys' invoked, include sub-sections from same file below
+	replace "wordstar(caps_key)"
+	replace "wordstar(main)"
 };
 
 // Wordstar keys with caps-q prefix and caps-k prefix
-// Note: key <AD02> is the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab)
 partial modifier_keys alphanumeric_keys
 xkb_symbols "main" {
-  include "wordstar(level5_enable)"  // includes clode below
+	include "wordstar(level5_enable)"  // includes clode below
 
-  // Set responses for each key on the keyboard in various shift states. Columns as follows:
-  //   { [normal, shifted, caps'ed, caps+shift, ^Q-prefixed, ^Q-shifted, ^Q-caps'ed, ^Q-caps+shift], [^K-prefixed, ^K-shifted, ^K-caps'ed, ^K-caps+shift, ...] }
-  // where ^Q and ^K means the previous keypress was caps+Q or caps+K
-  // Empty cells or 'NoSymbol' cells in the table means leave that table entry as it was (the original key functionality).
-  // 'VoidSymbol' cells produce no key
+	// Set responses for each key on the keyboard in various shift states. Columns as follows:
+	//   { [normal, shifted, caps'ed, caps+shift, ^Q-prefixed, ^Q-shifted, ^Q-caps'ed, ^Q-caps+shift], [^K-prefixed, ^K-shifted, ^K-caps'ed, ^K-caps+shift, ...] }
+	// where ^Q and ^K means the previous keypress was caps+Q or caps+K
+	// Empty cells or 'NoSymbol' cells in the table means leave that table entry as it was (the original key functionality).
+	// 'VoidSymbol' cells produce no key
 
-  // This works by making capslock a "level3 shift" in xkb terminology which means it
-  // shifts 2 columns to the right in the table (i.e. moves from column 1 to 3).
-  // ^Q is a level5 'latch' which also moves the *next key* 2 columns right in the table.
-  // ^K is a "group latch" which moves the next key into group2 (i.e. the second set of square brackets)
+	// This works by making capslock a "level3 shift" in xkb terminology which means it
+	// shifts 2 columns to the right in the table (i.e. moves from column 1 to 3).
+	// ^Q is a level5 'latch' which also moves the *next key* 2 columns right in the table.
+	// ^K is a "group latch" which moves the next key into group2 (i.e. the second set of square brackets)
 
-  // The drawback of this approach is that any level3 keys defined by the user are overwritten (.e.g AltGr+E producing euro).
-  // To avoid this, it could probably be implemented by changing capslock to level5 shift and then ^Q group 2 and ^K group 3
-  // This would leave AltGr as the only level-3 shift and move capslock to a level5 shift.
+	// The drawback of this approach is that any level3 keys defined by the user are overwritten (.e.g AltGr+E producing euro).
+	// To avoid this, it could probably be implemented by changing capslock to level5 shift and then ^Q group 2 and ^K group 3
+	// This would leave AltGr as the only level-3 shift and move capslock to a level5 shift.
 
-  // Note1: the Fxx keys are unused function keys just to link the matching entry in the wscompat file
-  // so I can redirect to a different keyboard key. It just has to be a name that is defined in keysymdef.h
+	// Note1: the Fxx keys here are unused function keys just to link the matching entry in the wscompat file
+	// so I can redirect to a different keyboard key. It just has to be a name that is defined in keysymdef.h
 
-  // Note2: it is necessary to fill all group2 [] entries with at least 4 columns if you want them to work properly (including
-  // overwriting vestigal AltGr chars) after ^KK/^KH because they turn shiftlock off but leave group2 latch on for another key.
-  // I can't fix this as there is no way to assign 2 actions (unshift & ungroup) to one key.
-  // But it does mean you must carefully spec group2 entries to work as follows:
-  //   group2[normal, shifted, caps'ed, caps+shift] after either ^K or after ^KK/^KH (remembering that ^KK turns on shiftlock)
-  // It also means I couldn't implement ^KQ/^KX (quit/close) lest they clobber ^Q-movement after ^KK
+	// Note2: it is necessary to fill all group2 [] entries with at least 4 columns if you want them to work properly (including
+	// overwriting vestigal AltGr chars) after ^KK/^KH because they turn shiftlock off but leave group2 latch on for another key.
+	// I can't fix this as there is no way to assign 2 actions (unshift & ungroup) to one key.
+	// But it does mean you must carefully spec group2 entries to work as follows:
+	//   group2[normal, shifted, caps'ed, caps+shift] after either ^K or after ^KK/^KH (remembering that ^KK turns on shiftlock)
+	// It also means I couldn't implement ^KQ/^KX (quit/close) lest they clobber ^Q-movement after ^KK
 
-  key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
-  key <AD01> { [NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch], [NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch] }; // ^Q=>prefix_key(Level5_Latch)
-  key <AD02> { [NoSymbol, NoSymbol, F26, F26] };  // ^W=>ctrl-Up=F26(scroll_up)
-  key <AD03> { [NoSymbol, NoSymbol, Up, Up], [NoSymbol, NoSymbol, Up, Up] };  // ^E=>Up
-  key <AD04> { [NoSymbol, NoSymbol, Page_Up, Page_Up, NoSymbol, NoSymbol, F32, F32], [NoSymbol, NoSymbol, F32, F32] }; // ^R=>Page_Up; ^QR=>ctrl-Home=F32
-  key <AD06> { [NoSymbol, NoSymbol, F28, F28] }; // ^Y=>shift-End=F28(delete_to_end_of_line but without final backspace press which I can't do)
-  key <AD10> { [NoSymbol, NoSymbol, NoSymbol, NoSymbol], [NoSymbol, NoSymbol, F25, F25] };  // ^KP=>F25(block_paste=paste)
-  key <AC01> { [NoSymbol, NoSymbol, F29, F29, NoSymbol, NoSymbol, F31, F31], [NoSymbol, NoSymbol, Left, Left] };  // ^A=>ctrl-Left=F29(word_left); ^QA=>ctrl-h=F31(search)
-  key <AC02> { [NoSymbol, NoSymbol, Left, Left, NoSymbol, NoSymbol, Home, Home], [NoSymbol, NoSymbol, F24, F24] }; // ^S=>Left; ^QS=>Home; ^KS=>ctrl-S(save)
-  key <AC03> { [NoSymbol, NoSymbol, Right, Right, NoSymbol, NoSymbol, End, End], [F35, F35, F24, F35] };  // ^D=>Right; ^QD=>End; ^KD(if block on)=>F35(block_duplicate); ^KD(if block off)=>F24(save)
-  key <AC04> { [NoSymbol, NoSymbol, F30, F30, NoSymbol, NoSymbol, Find, Find], [NoSymbol, NoSymbol, F30, F30]  };  // ^F=>ctrl-Right=F30; ^QF=>ctrl-F=Find
-  key <AC05> { [NoSymbol, NoSymbol, Delete, Delete], [NoSymbol, NoSymbol, Delete, Delete] };  // ^G
-  key <AC06> { [NoSymbol, NoSymbol, BackSpace, BackSpace], [Shift_L, Shift_L, Shift_L, Shift_L] };  // ^H=>Backspace; ^KH=>unblock (Shift_L performs un-shiftlock)
-  key <AC08> { [NoSymbol, NoSymbol, ISO_Group_Latch, ISO_Group_Latch], [Shift_Lock, Shift_Lock, Shift_Lock, Shift_Lock] }; // ^K=>prefix_key(Group_Latch); ^KK=>start_block
-  key <AC09> { [NoSymbol, NoSymbol, F3, F3] };  // ^L=>F3(repeat_find)
-  key <AB01> { [NoSymbol, NoSymbol, F27, F27] };  // ^Z=>ctrl-Down=F27(scroll_down)
-  key <AB02> { [NoSymbol, NoSymbol, Down, Down], [NoSymbol, NoSymbol, Down, Down] };  // ^X=>Down
-  key <AB03> { [NoSymbol, NoSymbol, Page_Down, Page_Down, NoSymbol, NoSymbol, F33, F33], [F34, F34, Page_Down, F34] };  // ^KC=>ctrl-x=F34(block_cut); ^QC->ctrl-End=F33
-  key <AB06> { [NoSymbol, NoSymbol, Return] };  // ^N=>insert_line
-  // Can't figure out how to implement:
-  //    insert line (^N) as Return+Left: only one key allowed
-  //    delete to end of line (^Y)
-  //    top/bottom of page (^QE/^QX)
+	// Note3 keycode meanings: <AD02> is the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab)
+
+	key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
+	// ^Q=>prefix_key(Level5_Latch)
+	key <AD01> { [NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch], [NoSymbol, NoSymbol, ISO_Level5_Latch, ISO_Level5_Latch] };
+	// ^W=>ctrl-Up=F26(scroll_up)
+	key <AD02> { [NoSymbol, NoSymbol, F26, F26] };
+	// ^E=>Up
+	key <AD03> { [NoSymbol, NoSymbol, Up, Up], [NoSymbol, NoSymbol, Up, Up] };
+	// ^R=>Page_Up; ^QR=>ctrl-Home=F32
+	key <AD04> { [NoSymbol, NoSymbol, Page_Up, Page_Up, NoSymbol, NoSymbol, F32, F32], [NoSymbol, NoSymbol, F32, F32] };
+	// ^Y=>ctrl-Shift-Delete=F28(delete_to_end_of_line/para)
+	key <AD06> { [NoSymbol, NoSymbol, F28, F28] };
+	// ^KP=>F25(block_paste=paste)
+	key <AD10> { [NoSymbol, NoSymbol, NoSymbol, NoSymbol], [NoSymbol, NoSymbol, F25, F25] };
+	// ^A=>ctrl-Left=F29(word_left); ^QA=>ctrl-h=F31(search)
+	key <AC01> { [NoSymbol, NoSymbol, F29, F29, NoSymbol, NoSymbol, F31, F31], [NoSymbol, NoSymbol, Left, Left] };
+	// ^S=>Left; ^QS=>Home; ^KS=>ctrl-S(save)
+	key <AC02> { [NoSymbol, NoSymbol, Left, Left, NoSymbol, NoSymbol, Home, Home], [NoSymbol, NoSymbol, F24, F24] };
+	// ^D=>Right; ^QD=>End; ^KD(if block on)=>F23(block_duplicate); ^KD(if block off)=>F24(save)
+	key <AC03> { [NoSymbol, NoSymbol, Right, Right, NoSymbol, NoSymbol, End, End], [F23, F23, F24, F23] };
+	// ^F=>ctrl-Right=F30; ^QF=>ctrl-F=Find
+	key <AC04> { [NoSymbol, NoSymbol, F30, F30, NoSymbol, NoSymbol, Find, Find], [NoSymbol, NoSymbol, F30, F30]  };
+	// ^G
+	key <AC05> { [NoSymbol, NoSymbol, Delete, Delete], [NoSymbol, NoSymbol, Delete, Delete] };
+	// ^H=>Backspace; ^KH=>unblock (Shift_L performs un-shiftlock)
+	key <AC06> { [NoSymbol, NoSymbol, BackSpace, BackSpace], [Shift_L, Shift_L, Shift_L, Shift_L] };
+	// ^K=>prefix_key(Group_Latch); ^KK=>start_block
+	key <AC08> { [NoSymbol, NoSymbol, ISO_Group_Latch, ISO_Group_Latch], [Shift_Lock, Shift_Lock, Shift_Lock, Shift_Lock] };
+	// ^L=>F3(repeat_find)
+	key <AC09> { [NoSymbol, NoSymbol, F3, F3] };
+	// ^Z=>ctrl-Down=F27(scroll_down)
+	key <AB01> { [NoSymbol, NoSymbol, F27, F27] };
+	// ^X=>Down
+	key <AB02> { [NoSymbol, NoSymbol, Down, Down], [NoSymbol, NoSymbol, Down, Down] };
+	// ^KC=>ctrl-x=F34(block_cut); ^QC->ctrl-End=F33
+	key <AB03> { [NoSymbol, NoSymbol, Page_Down, Page_Down, NoSymbol, NoSymbol, F33, F33], [F34, F34, Page_Down, F34] };
+	// ^N=>insert_line
+	key <AB06> { [NoSymbol, NoSymbol, Return] };
 };
 
 // Make capslock generate the level3 modifier
 partial modifier_keys
 xkb_symbols "caps_key" {
-  key <CAPS> {
-    type[Group1]="ONE_LEVEL",
-    symbols[Group1] = [ISO_Level3_Shift]
-  };
-  include "level3(modifier_mapping)"
+	key <CAPS> {
+		type[Group1]="ONE_LEVEL",
+		symbols[Group1] = [ISO_Level3_Shift]
+	};
+	include "level3(modifier_mapping)"
 };
 
 // Assign an actual keysym to ISO_Level5_Shift
@@ -90,16 +126,16 @@ xkb_symbols "caps_key" {
 // Don't know why it needs a dedicated key.
 partial modifier_keys
 xkb_symbols "level5_enable" {
-  // This code is stolen from 'include "level5(modifier_mapping)"' but with different key. Instead of using the <MDSW> key
-  // (for which the compiler complains that "<MDSW> is added to map for multiple modifiers"
-  // and ignores one of the definitions, making operation flakey.)
-  // I've chosen key <I153> because it's unlikely to be used (defined as KEY_SENDFILE in evdev)
-  // If you want a real key, say <RCTL> as a level 5 shift, specify it instead.
-  // (But why would you want than when you have ^Q latch to do it?)
-  // see /usr/share/X11/xkb/keycodes/evdev for key definitions like <I153>
-  key <I153> {
-    type[Group1] = "ONE_LEVEL",
-    symbols[Group1] = [ISO_Level5_Shift]
-  };
-  modifier_map Mod3 { <I153> };
+	// This code is stolen from 'include "level5(modifier_mapping)"' but with different key. Instead of using the <MDSW> key
+	// (for which the compiler complains that "<MDSW> is added to map for multiple modifiers"
+	// and ignores one of the definitions, making operation flakey.)
+	// I've chosen key <I153> because it's unlikely to be used (defined as KEY_SENDFILE in evdev)
+	// If you want a real key, say <RCTL> as a level 5 shift, specify it instead.
+	// (But why would you want than when you have ^Q latch to do it?)
+	// see /usr/share/X11/xkb/keycodes/evdev for key definitions like <I153>
+	key <I153> {
+		type[Group1] = "ONE_LEVEL",
+		symbols[Group1] = [ISO_Level5_Shift]
+	};
+	modifier_map Mod3 { <I153> };
 };

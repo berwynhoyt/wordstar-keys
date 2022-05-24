@@ -10,7 +10,7 @@ mkdir -p ~/.xkb/compat
 mkdir -p ~/.local/bin
 [[ ! -L ~/.xkb/symbols/wordstar ]] && cp wordstar ~/.xkb/symbols
 [[ ! -L ~/.xkb/compat/wscompat ]] && cp wscompat ~/.xkb/compat
-[[ ! -L ~/.local/bin/wskeys ]] && cp wskeys ~/.local/bin
+[[ ! -L ~/.local/bin/wskeys ]] && cp wskeys wskeys-debug ~/.local/bin
 echo "Done."
 
 # Ask whether to append wskeys to this user's startup file if it's not there, so that it gets automatically loaded with the X session
