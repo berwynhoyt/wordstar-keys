@@ -1,0 +1,9 @@
+#!/bin/bash
+# Print the current key map and reload with wordstar keys included
+# Note: -w1 makes xkbcomp ignore warnings that are in existing keymap files.
+# If you want warnings run to debug your key changes run 'wskeys -w10'
+# and compare differences to find new warnings
+setxkbmap -print \
+| sed -E 's/(.*xkb_compat.*".*)(".*)/\1+wscompat-test\2/g' \
+| sed -E 's/(.*xkb_symbols.*".*)(".*)/\1+wordstar-test\2/g' \
+| xkbcomp -w1 -I$HOME/.xkb - $DISPLAY "$@"

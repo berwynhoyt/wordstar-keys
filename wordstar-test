@@ -1,0 +1,198 @@
+#!xkb #specify_lexicon_for_editor_display_style
+
+// TODO:
+// Fix capslock sends a character, deleting spreadsheet cell: perhaps due to preserve thing I read from Ivan Pascal
+// Try to fix ^K problem by:
+// Try this config:
+	//caps=group3
+	//^Q=level3_Latch
+	//^K=group+1_Latch
+	//^KK=level5_Lock
+
+// Define Wordstar cursor control keys using capslock as the 'control' shift key
+//
+// e.g. ^S/^D moves left/right; ^E/^X moves up/down; ^A/^F word left/right; ^R/^C moves page Up/Down
+// and ^Q acts as a prefix, e.g. ^QS/^QD moves to Home/End of line; ^QR/^QC start/end of document
+// ^QF is find; ^L is re-find; ^QA is replace
+// ^KK locks the shift key on so you can select a block; ^KH releases it.
+// ^KC block_cut; ^KP block_paste; ^KD block_duplicate (if block is on only)
+// ^KS block_save; ^KD block_save (if block not on)
+// ^KQ quit doc without saving; ^KX save and close
+
+// Implementation quirks
+//
+// It really is a shame that xkb doesn't let me issue two keystrokes or I could do a lot better.
+// I can't figure out how to implement:
+//  ^Y (delete to end of line) issues ctrl-Shift-Delete which deletes to end of paragraph in a word processor
+//  ^N (insert line) issues <Enter> key. There is no way to issue a second Left key afterward to make it stay on the saame line like it should
+//  ^QE/^QX (top/bottom of page): there is no standard function to do this in linux
+//	^W/^Z (scroll up/down) issues ctrl-Up/Down which works in my editor but in few other apps.
+
+// X Keyboard file format is poorly documented in many places. I found the following to be most useful.
+// The first half of the first doc will help you understand this file:
+//   https://www.x.org/archive/X11R7.6/doc/xorg-docs/input/XKB-Enhancing.html
+//		(Note replacements for rotten links therein: https://web.archive.org/web/20021213091011/http://www.tsu.ru/~pascal/en/xkb/)
+//   https://www.charvolant.org/doug/xkb/html/xkb.html
+//   https://wiki.archlinux.org/title/X_keyboard_extension
+
+// Main import: wordstar(keys)
+default partial modifier_keys alphanumeric_keys
+xkb_symbols "keys" {
+	// when 'keys' invoked, include sub-sections from same file below
+	replace "wordstar-test(caps_key)"
+	replace "wordstar-test(qkeys)"
+	include "wordstar-test(kkeys)"
+};
+
+// Wordstar keys with caps-q prefix
+partial modifier_keys alphanumeric_keys
+xkb_symbols "qkeys" {
+	// Set responses for each key on the keyboard in various shift states. Columns as follows:
+	//   { [normal, shifted, caps'ed, caps+shift, ^Q-prefixed, ^Q-shifted, ^Q-caps'ed, ^Q-caps+shift], [^K-prefixed, ^K-shifted, ^K-caps'ed, ^K-caps+shift, ...] }
+	// where ^Q and ^K means the previous keypress was caps+Q or caps+K
+	// Empty cells or 'NoSymbol' cells in the table means leave that table entry as it was (the original key functionality).
+	// 'VoidSymbol' cells produce no key
+
+	// This works by making capslock a "level3 shift" in xkb terminology which means it
+	// shifts 2 columns to the right in the table (i.e. moves from column 1 to 3).
+	// ^Q is a level5 'latch' which also moves the *next key* 2 columns right in the table.
+	// ^K is a "group latch" which moves the next key into group2 (i.e. the second set of square brackets)
+
+	// Note1: the hex 0x---- keysym codes used here are in place of new keysym name definitions which would require
+	// recompilation of xkb. They must match the same codes in wscompat so it can redirect to a different keyboard key.
+	// The codes I've used are not not used by any keysyms in /usr/include/X11/keysymdef.h
+	// Be aware that it is possible to put RedirectKey actions directly into this file without using 
+	// keysym redirections or a compat file, but it makes the table unweildy. If you wish to do this, the syntax is as follows
+	//	key <ASDF> {
+	//		actions[Group1] = [RedirectKey(keycode=<QWER>, clearModifiers=AltGr+Shift, modifiers=Control), RedirectKey(...), ...],
+	//		actions[Group...] = [...] };   // notice lack of comma after the last []
+
+	// Note2: xkb has a really annoying quirk that makes ^KK implementation difficult and messy:
+	// a key like ^KK that does group-shift or level-shift does not get recognised as a key by xkb's
+	// unlatching mechanism. This means that the latch is still in effect after ^KK, so the next key
+	// pressed after ^KK will be looked up as a level5 key in group4, and subsequent keys in group3
+	// so you need to fill up both groups with our specified keys. If you leave it empty it will fall back to group1.
+	// I could make it fall back to group 3 if it's empty, but then normal non-caps'ed keys wouldn't do anything
+	// since group 3 table is empty for normal keys.
+
+	// Note3: I tried making caps key a level3_latch, but for some reason it clears cells in google sheets -- annoying!
+	// So it's a group_latch instead.
+
+	// Note4 keycode meanings: <AD02> is the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab).
+
+	name[Group4] = "wskeys";
+	key.type[Group3] = "EIGHT_LEVEL_ALPHABETIC";
+	groupsredirect = 1;		// if a key is missing in any group, revert to group 1
+
+	// columns: { [], [], [^key, ^+key,     ^Qkey, ^Q+key] }            // where ^=caps; +=Shift
+	// ^Q=>prefix_key(Level3_Latch)
+	key <AD01> { [], [], [ISO_Level3_Latch, ISO_Level3_Latch] };
+	// ^W=>ctrl-Up=0xee00(scroll_up)
+	key <AD02> { [], [], [0xee00, 0xee00] };
+	// ^E=>Up
+	key <AD03> { [], [], [Up, Up, VoidSymbol, VoidSymbol] };
+	// ^R=>Page_Up; ^QR=>ctrl-Home=0xee02
+	key <AD04> { [], [], [Page_Up, Page_Up, 0xee02, 0xee02] };
+	// ^Y=>ctrl-Shift-Delete=0xee0b(delete_to_end_of_line/para)
+	key <AD06> { [], [], [0xee0b, 0xee0b] };
+	// ^A=>ctrl-Left=0xee04(word_left); ^QA=>ctrl-h=0xee06(search)
+	key <AC01> { [], [], [0xee04, 0xee04, 0xee06, 0xee06] };
+	// ^S=>Left; ^QS=>Home
+	key <AC02> { [], [], [Left, Left, Home, Home] };
+	// ^D=>Right; ^QD=>End
+	key <AC03> { [], [], [Right, Right, End, End] };
+	// ^F=>ctrl-Right=0xee05; ^QF=>ctrl-F=Find
+	key <AC04> { [], [], [0xee05, 0xee05, Find, Find]  };
+	// ^G
+	key <AC05> { [], [], [Delete, Delete] };
+	// ^H=>Backspace
+	key <AC06> { [], [], [BackSpace, BackSpace] };
+	// ^L=>F3(repeat_find)
+	key <AC09> { [], [], [F3, F3] };
+	// ^Z=>ctrl-Down=0xee01(scroll_down)
+	key <AB01> { [], [], [0xee01, 0xee01] };
+	// ^X=>Down
+	key <AB02> { [], [], [Down, Down, VoidSymbol, VoidSymbol] };
+	// ^C=>Page_Down; ^QC->ctrl-End=0xee03
+	key <AB03> { [], [], [Page_Down, Page_Down, 0xee03, 0xee03] };
+	// ^N=>insert_line
+	key <AB06> { [], [], [Return, Return] };
+};
+
+// Wordstar keys with caps-k prefix
+partial modifier_keys alphanumeric_keys
+xkb_symbols "kkeys" {
+	include "wordstar-test(level5_enable)"  // includes code below
+
+	name[Group3] = "ws-mark-keys";
+	key.type[Group4] = "EIGHT_LEVEL";
+	key.type[Group3] = "EIGHT_LEVEL_ALPHABETIC";
+	key.groupsredirect = 1;		// if a key is missing in any group, revert to group 1
+
+	// columns: { [], [], [^key, ^+key,        -, -,     blockmode: key, +key],    // where ^=caps; +=Shift
+	//                            [^Kkey, ^K+key,   -, -,     blockmode: ^Kkey, ^K+key] };
+	// 
+	// ^KP=>0xee09(block_paste=paste)
+	key <AD10> { [], [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee09, 0xee09],
+										[0xee09, 0xee09, Up, Up, Down, Down] };
+	// ^KS=>ctrl-S(save)
+	key <AC02> { [], [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee0a, 0xee0a] };
+	// ^KD(if block on)=>0xee07(block_duplicate(copy));
+	key <AC03> { [], [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee07, 0xee07] };
+	// ^KH=>unblock (Shift_L performs un-shiftlock)
+	key <AC06> { [], [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xef01, 0xef01],
+										[VoidSymbol, VoidSymbol, NoSymbol, NoSymbol, ISO_Level5_Shift, ISO_Level5_Shift] };
+	// ^K=>prefix_key(Group4_Latch); ^KK=>start_block
+	key <AC08> { [], [], [0xef04, 0xef04, NoSymbol, NoSymbol, 0xef04, 0xef04],
+										[ISO_Level5_Lock, ISO_Level5_Lock, NoSymbol, NoSymbol, ISO_Level5_Shift, ISO_Level5_Shift] };
+	// ^KX=>ctrl-x=0xee08(block_cut)
+	key <AB02> { [], [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee08, 0xee08] };
+	// ^KC=>ctrl-x=0xee08(block_cut)
+	key <AB03> { [], [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee08, 0xee08] };
+
+// Try this config:
+	//caps=group3
+	//^Q=level3_Latch
+	//^K=group4_Latch
+	//^KK=level5_Lock
+
+	// Add cursor keys for block mode selection -- simulator cursor keys with shift pressed
+	// See note 2 above re the need to fill both group 3 and 4
+	key.type[Group2] = "EIGHT_LEVEL";
+	// ^E=>Up
+	key <AD03> { [], [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee10, 0xee10],
+										[Up, Up, VoidSymbol, VoidSymbol, 0xee10, 0xee10] };
+	key <AB03> { [], [], [],
+										[Page_Down, Page_Down, NoSymbol, NoSymbol, 0xee08, 0xee08] };
+
+//	key <AB02> { [], [z,x,c,v,b,n,m,l], [a,s,d,f,g,h,j,k], [q, w, r, t, y, u, i, o] }; // after ^KK: yg; after ^KH: qa
+};
+
+// Make capslock generate the level3 modifier
+partial modifier_keys
+xkb_symbols "caps_key" {
+	key <CAPS> {
+		type = "TWO_LEVEL",
+		// caps=>group3; shift-caps=>clear Level5_Shift (in case it gets stuck when ^KH isn't working)
+		[0xef03, ISO_Level5_Shift], [0xef03, ISO_Level5_Shift], [0xef03, ISO_Level5_Shift], [0xef03, ISO_Level5_Shift]
+	};
+};
+
+// Assign an actual keysym to ISO_Level5_Shift
+// Otherwise ^Q key prefixes don't work, even though they invoke ISO_Level5_shift.
+// Don't know why it needs a dedicated key.
+partial modifier_keys
+xkb_symbols "level5_enable" {
+	// This code is stolen from 'include "level5(modifier_mapping)"' but with different key. Instead of using the <MDSW> key
+	// (for which the compiler complains that "<MDSW> is added to map for multiple modifiers"
+	// and ignores one of the definitions, making operation flakey.)
+	// I've chosen key <I153> because it's unlikely to be used (defined as KEY_SENDFILE in evdev)
+	// If you want a real key, say <RCTL> as a level 5 shift, specify it instead.
+	// (But why would you want than when you have ^Q latch to do it?)
+	// see /usr/share/X11/xkb/keycodes/evdev for key definitions like <I153>
+	key <I153> {
+		type[Group1] = "ONE_LEVEL",
+		symbols[Group1] = [ISO_Level5_Shift]
+	};
+	modifier_map Mod3 { <I153> };
+};

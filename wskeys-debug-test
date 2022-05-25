@@ -1,0 +1,4 @@
+#!/bin/bash
+# run wskeys with -w10 maximum warnings, but filter out any expected warnings that are produced by the standard xkb files
+setxkbmap -print | xkbcomp -w10 - $DISPLAY 2>/tmp/wskeys.warnings.default
+~/projects/wskeys/wskeys-test -w10 2>&1 | diff /tmp/wskeys.warnings.default - | grep "^>" | egrep -v 'Warning:.*Key "(Caps_Lock|Meta_R|Alt_R)" not found in' | egrep -v "Warning:.*Symbol map for key.*redefined|Using last definition for conflicting fields"

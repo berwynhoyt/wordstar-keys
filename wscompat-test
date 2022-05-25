@@ -1,0 +1,91 @@
+#!xkb #specify_lexicon_for_editor_display_style
+// Define xkb 'compat' file key interpretations for wordstar cursor controls
+
+// Note: the hex 0x---- keysym codes used here are invented but they must match the ones used in wordstar file
+
+default partial xkb_compatibility "redirects" {
+	interpret Shift_Lock {
+		action = LockMods(modifiers=Shift);
+	};
+
+	// Set up access to four groups in the way we use them
+	interpret 0xef01 { action = LockGroup(group=1); };
+	interpret 0xef02 { action = LockGroup(group=2); };
+	interpret 0xef03 { action = SetGroup(group=3); };     // Caps change to group 3 only while pressed
+	interpret 0xef04 { action = LatchGroup(group=4); };  // Latch group 4 for ^K prefix key
+
+	// Note: keycodes are of the form <AD02> for the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab),
+	// and function keys are <FK0x>; the rest are found in /usr/share/X11/xkb/keycodes/evdev.
+
+	// Implement various key redirections that could not be done with bare keys.
+	// Redirections like these are necessary if you want to press a key with Ctrl or Shift
+	interpret 0xee00 {  // ^W ctrl-Up (scroll up)
+		action = RedirectKey(keycode=<UP>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret 0xee01 {  // ^Z ctrl-Down (scroll down)
+		action = RedirectKey(keycode=<DOWN>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
+	interpret 0xee02 {  // ^QR ctrl-Home
+		action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret 0xee03 {  // ^QC ctrl-End
+		action = RedirectKey(keycode=<END>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
+	interpret 0xee04 {  // ^A ctrl-Left (word left)
+		action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Control);
+	};
+	interpret 0xee05 {  // ^F ctrl-Left (word right)
+		action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Control);
+	};
+
+	interpret Find {  // ^QF ctrl-f (find)
+		action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr, modifiers=Control);
+	};
+	interpret 0xee06 {  // ^QA ctrl-h (replace)
+		action = RedirectKey(keycode=<AC06>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
+	interpret 0xee07 {  // ^KD ctrl-c (block copy)
+		action = RedirectKey(keycode=<AB03>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret 0xee08 {  // ^KC ctrl-x (block cut)
+		action = RedirectKey(keycode=<AB02>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret 0xee09 {  // ^KP ctrl-v (block paste=paste)
+		action = RedirectKey(keycode=<AB04>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+	interpret 0xee0a {  // ^KS/^KD ctrl-s (save)
+		action = RedirectKey(keycode=<AC02>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
+	interpret 0xee0b {  // ^Y ctrl-Shift-Delete (to be used as part of delete-to-end-of-line)
+		action = RedirectKey(keycode=<DELE>, clearModifiers=AltGr, modifiers=Shift+Control);
+	};
+
+	interpret F3 {  // ^L (repeat_find: remove AltGr modifier so it works even while caps held down)
+		action = RedirectKey(keycode=<FK03>, clearModifiers=AltGr+Shift);
+	};
+
+	// ===============================================
+	// Now define codes needed for cursor motion in block selection mode after ^KK
+
+	// Define cursor keys for block mode selection
+	interpret 0xee10 {  // shift-^E=>shift-Up
+		action = RedirectKey(keycode=<UP>, clearModifiers=AltGr, modifiers=Shift);
+	};
+
+	// ===============================================
+	// Now define codes needed for cursor motion in block selection mode after ^KK
+
+	// See if we can get keys to produce scroll wheel events.
+	// Not sure why this doesn't work. Leave it here to prove I've tried it.
+	// Instead, I've used ctrl+Up/Down for scroll as some editors scroll that way
+//~   interpret Pointer_Button4 {
+//~     action = PointerButton(button=4);
+//~   };
+//~   interpret Pointer_Button5 {
+//~     action = PointerButton(button=5);
+//~   };
+};
