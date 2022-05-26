@@ -8,11 +8,25 @@ default partial xkb_compatibility "redirects" {
 		action = LockMods(modifiers=Shift);
 	};
 
-	// Set up access to four groups in the way we use them
+	// Set up easy access to four groups; may not use them all
 	interpret 0xef01 { action = LockGroup(group=1); };
 	interpret 0xef02 { action = LockGroup(group=2); };
-	interpret 0xef03 { action = SetGroup(group=3); };     // Caps change to group 3 only while pressed
-	interpret 0xef04 { action = LatchGroup(group=4); };  // Latch group 4 for ^K prefix key
+	interpret 0xef03 { action = LockGroup(group=3); };
+	interpret 0xef04 { action = LockGroup(group=4); };
+
+	// Set up caps key to increment group
+	// Note that SetGroup(group=2) actually does SetGroup(group=+1); it then subtracts 1 when the key is lifted.
+	interpret 0xef00 { action = SetGroup(group=+1); };
+
+	// Set up ^K to latch group3
+	// Be aware that LatchGroup(group=n) internally translates to LatchGroup(group=+-n).
+	// This is important to work out where a deferred group latch will land if there is a LockGroup in between.
+	// The formula for next group is wrapped_group(new locked group +- groups added by any pending latch delta + groups added by caps key)
+
+	interpret 0xef11 { action = LatchGroup(group=1); };
+	interpret 0xef12 { action = LatchGroup(group=2); };
+	interpret 0xef13 { action = LatchGroup(group=3); };
+	interpret 0xef14 { action = LatchGroup(group=4); };
 
 	// Note: keycodes are of the form <AD02> for the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab),
 	// and function keys are <FK0x>; the rest are found in /usr/share/X11/xkb/keycodes/evdev.
@@ -72,14 +86,21 @@ default partial xkb_compatibility "redirects" {
 	// Now define codes needed for cursor motion in block selection mode after ^KK
 
 	// Define cursor keys for block mode selection
-	interpret 0xee10 {  // shift-^E=>shift-Up
+	interpret 0xee10 {  // block-^E=>shift-Up
 		action = RedirectKey(keycode=<UP>, clearModifiers=AltGr, modifiers=Shift);
+	};
+	interpret 0xee11 {  // block-^X=>shift-Down
+		action = RedirectKey(keycode=<DOWN>, clearModifiers=AltGr, modifiers=Shift);
+	};
+
+	// Make it so that ISO_Level2_Latch doesn't require the use of the shift key -- so we can use it for ^K prefix which then equals shift
+	interpret ISO_Level2_Latch {
+		action = LatchMods(modifiers=Shift);
 	};
 
 	// ===============================================
-	// Now define codes needed for cursor motion in block selection mode after ^KK
-
 	// See if we can get keys to produce scroll wheel events.
+
 	// Not sure why this doesn't work. Leave it here to prove I've tried it.
 	// Instead, I've used ctrl+Up/Down for scroll as some editors scroll that way
 //~   interpret Pointer_Button4 {
