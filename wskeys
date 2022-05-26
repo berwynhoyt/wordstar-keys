@@ -3,6 +3,12 @@
 # Note: -w1 makes xkbcomp ignore warnings that are in existing keymap files.
 # If you want warnings run to debug your key changes run 'wskeys -w10'
 # and compare differences to find new warnings
+
+setxkbmap -print | grep -q "xkb_symbols.*include.*:" \
+  && echo "Cannot run wskeys with more than one keyboard map loaded." \
+  && echo "Instead, set up hotkeys to load your different keymaps. For example, make them run:" \
+  && echo "  setxkbmap gr && wskeys" && exit 1
+
 setxkbmap -print \
 | sed -E 's/(.*xkb_compat.*".*)(".*)/\1+wscompat\2/g' \
 | sed -E 's/(.*xkb_symbols.*".*)(".*)/\1+wordstar\2/g' \
