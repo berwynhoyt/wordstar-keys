@@ -1,93 +1,156 @@
 #!xkb #specify_lexicon_for_editor_display_style
-// Define compat file for wordstar cursor controls
+// Define xkb 'compat' file key interpretations for wordstar cursor controls
 
-default partial xkb_compatibility "default" {
-	include "wscompat(redirects)"
-};
+// Note: the hex 0x---- keysym codes used here are invented but they must match the ones used in wordstar file
 
-partial xkb_compatibility "redirects" {
-	interpret Shift_Lock {
-		action = LockMods(modifiers=Shift);
-	};
+default partial xkb_compatibility "redirects" {
+	// Set up easy access to four groups; may not use them all
+	// Be aware that any currently pressed SetGroup keys add to whatever you select here (see below)
+	interpret 0xef01 { action = LockGroup(group=1); };
+	interpret 0xef02 { action = LockGroup(group=2); };
+	interpret 0xef03 { action = LockGroup(group=3); };
+	interpret 0xef04 { action = LockGroup(group=4); };
 
-	// Note3: keycodes are of the form <AD02> for the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab),
+	// Set up caps key to increment group
+	// Note that SetGroup(group=2) internally actually does SetGroup(group=+1); it then subtracts 1 when the key is lifted.
+	// So we use the one it actually does to avoid confusion when doing simultaneous LockGroups which this adds to
+	interpret 0xef00 { action = SetGroup(group=+1); };
+
+	// Set up ^K to latch group3
+	//   Be aware that LatchGroup(group=n) internally translates to LatchGroup(group=+-n).
+	//	 where n is set to get to the group you want, taking into account any LockGroups and any SetGroups keys currently down.
+	//   This is important to work out where a deferred group latch will land if there is a LockGroup in between.
+	//   The formula for next group is wrapped_group(new locked group +- groups added by any pending latch delta + groups added by caps key)
+	interpret 0xef11 { action = LatchGroup(group=1); };
+	interpret 0xef12 { action = LatchGroup(group=2); };
+	interpret 0xef13 { action = LatchGroup(group=3); };
+	interpret 0xef14 { action = LatchGroup(group=4); };
+
+	// Note: keycodes are of the form <AD02> for the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab),
 	// and function keys are <FK0x>; the rest are found in /usr/share/X11/xkb/keycodes/evdev.
 
 	// Implement various key redirections that could not be done with bare keys.
-	// Most of these are to send a key with control pressed, which is not possible with bare keys.
-	interpret F26 {  // ^W ctrl-Up (scroll up)
+	// Redirections like these are necessary if you want to press a key with Ctrl or Shift
+	interpret 0xee00 {  // ^W ctrl-Up (scroll up)
 		action = RedirectKey(keycode=<UP>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
-	interpret F27 {  // ^Z ctrl-Down (scroll down)
+	interpret 0xee01 {  // ^Z ctrl-Down (scroll down)
 		action = RedirectKey(keycode=<DOWN>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
-	interpret F32 {  // ^QR ctrl-Home
+	interpret 0xee02 {  // ^QR ctrl-Home
 		action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
-	interpret F33 {  // ^QC ctrl-End
+	interpret 0xee03 {  // ^QC ctrl-End
 		action = RedirectKey(keycode=<END>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
-	interpret F29 {  // ^A ctrl-Left (word left)
+	interpret 0xee04 {  // ^A ctrl-Left (word left)
 		action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Control);
 	};
-	interpret F30 {  // ^F ctrl-Left (word right)
+	interpret 0xee05 {  // ^F ctrl-Left (word right)
 		action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Control);
 	};
 
 	interpret Find {  // ^QF ctrl-f (find)
-		action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr, modifiers=Control);
+		action = RedirectKey(keycode=<AC04>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
-	interpret F31 {  // ^QA ctrl-h (replace)
+	interpret 0xee06 {  // ^QA ctrl-h (replace)
 		action = RedirectKey(keycode=<AC06>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
-	interpret F23 {  // ^KD ctrl-c (block copy)
+	interpret 0xee07 {  // ^KC ctrl-c (copy_block)
 		action = RedirectKey(keycode=<AB03>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
-	interpret F34 {  // ^KC ctrl-x (block cut)
+	interpret 0xee08 {  // ^KC ctrl-x (cut_block)
 		action = RedirectKey(keycode=<AB02>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
-	interpret F25 {  // ^KP ctrl-v (block paste=paste)
+	interpret 0xee09 {  // ^KP ctrl-v (paste_block)
 		action = RedirectKey(keycode=<AB04>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
-	interpret F24 {  // ^KS/^KD ctrl-s (save)
+	interpret 0xee0a {  // ^KS
 		action = RedirectKey(keycode=<AC02>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
-	interpret F28 {  // ^Y ctrl-Shift-Delete (to be used as part of delete-to-end-of-line)
+	interpret 0xee0b {  // ^QY ctrl-Shift-Delete (to be used as part of delete-to-end-of-line)
 		action = RedirectKey(keycode=<DELE>, clearModifiers=AltGr, modifiers=Shift+Control);
+	};
+
+	interpret 0xee0c {  // ^QS Home (unshifted)
+		action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr+Shift);
+	};
+	interpret 0xee0d {  // ^QD End (unshifted)
+		action = RedirectKey(keycode=<END>, clearModifiers=AltGr+Shift);
+	};
+
+	interpret 0xee0e {  // ^P ctrl-P (print)
+		action = RedirectKey(keycode=<AD10>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
 	interpret F3 {  // ^L (repeat_find: remove AltGr modifier so it works even while caps held down)
 		action = RedirectKey(keycode=<FK03>, clearModifiers=AltGr+Shift);
 	};
 
-	interpret F35 {
-		action = RedirectKey(keycode=<RCTL>, clearModifiers=AltGr+Shift);
+	// ===============================================
+	// Now define codes needed for cursor motion in block selection mode after ^KK
+
+	// Define cursor keys for block mode selection
+	interpret 0xee10 {  // block-^E=>shift-Up
+		action = RedirectKey(keycode=<UP>, clearModifiers=AltGr, modifiers=Shift);
+	};
+	interpret 0xee11 {  // block-^X=>shift-Down
+		action = RedirectKey(keycode=<DOWN>, clearModifiers=AltGr, modifiers=Shift);
 	};
 
-	interpret ISO_Group_Latch {
-		useModMapMods = level1;
-		action= LatchGroup(group=2);
+	interpret 0xee1a {  // block-^A=>shift-ctrl-Left
+		action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Shift+Control);
+	};
+	interpret 0xee1b {  // block-^D=>shift-ctrl-Right
+		action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Shift+Control);
 	};
 
-//~ #Work out why the following is different than the above
-//~     virtual_modifiers  LevelThree,AltGr;
-//~ 	interpret F35 { // Same as ISO_Group_Latch but also unlatches shift if possible
-//~ 		virtualModifier= AltGr;
-//~ 		useModMapMods = level1;
-//~ 		action = LatchGroup(group=1, clearLocks);
-//~ 	};
+	interpret 0xee12 {  // block-^S=>shift-Left
+		action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Shift);
+	};
+	interpret 0xee13 {  // block-^D=>shift-Right
+		action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Shift);
+	};
 
+	interpret 0xee18 {  // block-^QS=>shift-Home
+		action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr, modifiers=Shift);
+	};
+	interpret 0xee19 {  // block-^QD=>shift-End
+		action = RedirectKey(keycode=<END>, clearModifiers=AltGr, modifiers=Shift);
+	};
+
+	interpret 0xee14 {  // block-^R=>shift-Page_Up
+		action = RedirectKey(keycode=<PGUP>, clearModifiers=AltGr, modifiers=Shift);
+	};
+	interpret 0xee15 {  // block-^C=>shift-Page_Down
+		action = RedirectKey(keycode=<PGDN>, clearModifiers=AltGr, modifiers=Shift);
+	};
+
+	interpret 0xee16 {  // block-^QR=>shift-ctrl-Home
+		action = RedirectKey(keycode=<HOME>, clearModifiers=AltGr, modifiers=Shift+Control);
+	};
+	interpret 0xee17 {  // block-^QC=>shift-ctrl-End
+		action = RedirectKey(keycode=<END>, clearModifiers=AltGr, modifiers=Shift+Control);
+	};
+
+	// Make it so that ISO_Level2_Latch doesn't require the use of the shift key -- so we can use it for ^K prefix which then equals shift
+	interpret ISO_Level2_Latch {
+		action = LatchMods(modifiers=Shift);
+	};
+
+	// ===============================================
 	// See if we can get keys to produce scroll wheel events.
+
 	// Not sure why this doesn't work. Leave it here to prove I've tried it.
 	// Instead, I've used ctrl+Up/Down for scroll as some editors scroll that way
-//~   interpret Pointer_Button4 {
-//~     action= PointerButton(button=4);
-//~   };
-//~   interpret Pointer_Button5 {
-//~     action= PointerButton(button=5);
-//~   };
+// ~   interpret Pointer_Button4 {
+// ~     action = PointerButton(button=4);
+// ~   };
+// ~   interpret Pointer_Button5 {
+// ~     action = PointerButton(button=5);
+// ~   };
 };
