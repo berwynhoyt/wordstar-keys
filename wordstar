@@ -17,7 +17,7 @@
 // It really is a shame that xkb doesn't let me issue two keystrokes or I could do a lot better.
 // With two keystrokes I could implement:
 //  ^Y (delete to end of line) issues ctrl-Shift-Delete which deletes to end of paragraph in a word processor
-//  ^N (insert line) issues <Enter> key. There is no way to issue a second Left key afterward to make it stay on the saame line like it should
+//  ^N (insert line) issues <Enter> key. There is no way to issue a second Left key afterward to make it stay on the same line like it should
 //  ^QE/^QX (top/bottom of page): there is no standard function to do this in linux
 //	^W/^Z (scroll up/down) issues ctrl-Up/Down which works in my editor but in few other apps.
 //  ^KX/^KC automatically exit block mode afterward
