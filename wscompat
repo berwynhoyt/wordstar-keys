@@ -1,4 +1,4 @@
-#!xkb #specify_lexicon_for_editor_display_style
+#!xkb #specify_lexicon_for_editor_display_style; tabsize=4
 // Define xkb 'compat' file key interpretations for wordstar cursor controls
 
 // Note: the hex 0x---- keysym codes used here are invented but they must match the ones used in wordstar file

@@ -1,4 +1,4 @@
-#!xkb //specify_lexicon_for_editor_display_style
+#!xkb //specify_lexicon_for_editor_display_style; tabsize=4
 
 // Define Wordstar cursor control keys using capslock as the 'control' shift key
 //

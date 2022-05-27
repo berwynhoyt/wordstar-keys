@@ -5,9 +5,9 @@
 # and compare differences to find new warnings
 
 setxkbmap -print | grep -q "xkb_symbols.*include.*:" \
-  && echo "Cannot run wskeys with more than one keyboard map loaded." \
-  && echo "Instead, set up hotkeys to load your different keymaps. For example, make them run:" \
-  && echo "  setxkbmap gr && wskeys" && exit 1
+  && echo >&2 "Warning: Cannot run wskeys with more than one keyboard map loaded." \
+  && echo >&2 "Instead, set up hotkeys to load your different keymaps. For example, make them run:" \
+  && echo >&2 "  setxkbmap gr && wskeys"
 
 setxkbmap -print \
 | sed -E 's/(.*xkb_compat.*".*)(".*)/\1+wscompat\2/g' \

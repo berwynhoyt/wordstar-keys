@@ -13,14 +13,14 @@ mkdir -p ~/.local/bin
 [[ ! -L ~/.local/bin/wskeys ]] && cp wskeys wskeys-debug ~/.local/bin
 echo "Done."
 
-# Ask whether to append wskeys to this user's startup file if it's not there, so that it gets automatically loaded with the X session
-startup_file=~/.xinitrc
-if ! [[ -e "$startup_file" ]] || ! grep -q "/wskeys$" "$startup_file"; then
-  read -p "Shall I make wskeys load with the X Windows session by adding it to "$startup_file" (y/n)? " -n1 add_at_startup
+# Ask whether to make wskeys auto-load when X session starts for this user
+startup_file=~/.config/autostart/WordstarKeys.desktop
+if ! [[ -e "$startup_file" ]]; then
+  read -p "Shall I make wskeys load with the X Windows session by adding it at "$startup_file" (y/n)? " -n1 add_at_startup
   echo
   if [[ "$add_at_startup" == "y" ]]; then
-    [[ ! -e "$startup_file" ]] && touch "$startup_file"  # create it if necessary
-    printf "\n# Load wordstar cursor control keys when X session starts\n~/.local/bin/wskeys\n" >>"$startup_file"
+    cp WordstarKeys.desktop $startup_file
+    echo "Done."
   fi
 fi
 

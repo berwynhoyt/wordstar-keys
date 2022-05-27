@@ -1,0 +1,12 @@
+[Desktop Entry]
+
+# X desktop file to load Wordstar Keys and auto-load at startup
+
+Type=Application
+Exec=wskeys
+X-GNOME-Autostart-enabled=true
+NoDisplay=false
+Hidden=false
+Name[en_NZ]=Wordstar Keys
+Comment[en_NZ]=Load keyboard with wordstar additions when X starts
+X-GNOME-Autostart-Delay=0
