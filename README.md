@@ -30,13 +30,8 @@ With two keystrokes I could implement:
 
 Consequently, it's not quite perfect. But given XKB's limitations, it's pretty good. Let me know if you know how to make XKB send multiple keystrokes from one key.
 
-### Helpful XKB docs
-X Keyboard file format is poorly documented in far too many places. The first half of the first doc will be particularly useful to help you understand wskeys. I found the following to be most useful.
 
-Ivan Pascal's documentation is most in-depth and therefore most useful for this kind of thing. But most of it is no longer available except on the [wayback machine here](https://web.archive.org/web/20021213091011/http://www.tsu.ru/~pascal/en/xkb/). He has an introductory [article here](https://www.x.org/archive/X11R7.6/doc/xorg-docs/input/XKB-Enhancing.html); its links are rotten but you can find them again in the wayback machine link. You could also check out [Doug Palmer's docs](https://www.charvolant.org/doug/xkb/html/xkb.html) with particularly useful tables of [what can go into key action statements](https://www.charvolant.org/doug/xkb/html/node5.html#SECTION00055000000000000000) and some [Archlinux docs](https://wiki.archlinux.org/title/X_keyboard_extension), but I think they're less helpful. Martin Krafft also has a [nice article](https://www.linux.com/news/extending-x-keyboard-map-xkb/) about the process he went through to learn how to load key maps with xkbcomp, which is what got me started; but again, his [repository links](https://git.madduck.net/) have all changed (you can only track them down if you look into the git history around the same dates as the articles).
-
-
-### Installation
+## Installation
 
 ```
     git clone <this_repository> wskeys
@@ -51,3 +46,10 @@ Ivan Pascal's documentation is most in-depth and therefore most useful for this 
 If you use the Wayland Display Server (which I think is now the **Ubuntu** default), then wskeys will not work because Weyland does not listen to the setxkbmap or xkbcomp commands. It is possible to get xkb key layouts working with Weyland at startup, but it requires that a rules file be created to map wskeys to a key layout option, and it requires wskeys files to be installed into the xkb system folder. This has yet to be implemented.
 
 For now, just run switch to X Server instead of Weyland, or implement it yourself.
+
+
+### Helpful XKB docs
+
+If things go wrong, Damiano Venturin has a great little article on [making key map changes in xkb](https://medium.com/@damko/a-simple-humble-but-comprehensive-guide-to-xkb-for-linux-6f1ad5e13450). For more detailed stuff, I'm afraid the X Keyboard file format is poorly documented in far too many places. I found the following to be most useful.
+
+Ivan Pascal's documentation is most in-depth and therefore most useful for this kind of thing. But most of it is no longer available except on the [wayback machine here](https://web.archive.org/web/20021213091011/http://www.tsu.ru/~pascal/en/xkb/). He has an introductory [article here](https://www.x.org/archive/X11R7.6/doc/xorg-docs/input/XKB-Enhancing.html); its links are rotten but you can find them again in the wayback machine link. You could also check out [Doug Palmer's docs](https://www.charvolant.org/doug/xkb/html/xkb.html) with particularly useful tables of [what can go into key action statements](https://www.charvolant.org/doug/xkb/html/node5.html#SECTION00055000000000000000) and some [Archlinux docs](https://wiki.archlinux.org/title/X_keyboard_extension), but I think they're less helpful. Martin Krafft also has a [nice article](https://www.linux.com/news/extending-x-keyboard-map-xkb/) about the process he went through to learn how to load key maps with xkbcomp, which is what got me started; but again, his [repository links](https://git.madduck.net/) have all changed (you can only track them down if you look into the git history around the same dates as the articles).
