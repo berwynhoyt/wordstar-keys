@@ -43,3 +43,11 @@ Ivan Pascal's documentation is most in-depth and therefore most useful for this 
     cd wskeys
     ./install
 ```
+
+### Gotchas
+
+#### Weyland / Ubuntu
+
+If you use the Wayland Display Server (which I think is now the **Ubuntu** default), then wskeys will not work because Weyland does not listen to the setxkbmap or xkbcomp commands. It is possible to get xkb key layouts working with Weyland at startup, but it requires that a rules file be created to map wskeys to a key layout option, and it requires wskeys files to be installed into the xkb system folder. This has yet to be implemented.
+
+For now, just run switch to X Server instead of Weyland, or implement it yourself.

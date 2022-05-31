@@ -5,7 +5,8 @@
 # and compare differences to find new warnings
 
 setxkbmap -print | grep -q "xkb_symbols.*include.*:" \
-  && echo >&2 "Warning: Cannot run wskeys with more than one keyboard map loaded." \
+  && echo >&2 "Warning: It is unwise to run wskeys with more than one keyboard map loaded." \
+  && echo >&2 "as wskeys will clobber some of the keys in your secondary (group2) key map." \
   && echo >&2 "Instead, set up hotkeys to load your different keymaps. For example, make them run:" \
   && echo >&2 "  setxkbmap gr && wskeys"
 
