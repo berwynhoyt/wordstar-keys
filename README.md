@@ -41,11 +41,15 @@ Consequently, it's not quite perfect. But given XKB's limitations, it's pretty g
 
 ### Gotchas
 
-#### Weyland / Ubuntu
+#### Wayland / Ubuntu
 
 If you use the Wayland Display Server (which I think is now the **Ubuntu** default), then wskeys will not work because Weyland does not listen to the setxkbmap or xkbcomp commands. It is possible to get xkb key layouts working with Weyland at startup, but it requires that a rules file be created to map wskeys to a key layout option, and it requires wskeys files to be installed into the xkb system folder. This has yet to be implemented.
 
-For now, just run switch to X Server instead of Weyland, or implement it yourself.
+For now, you can switch to X Server instead of Wayland, or implement it yourself. To switch to X Server in Ubuntu, log out, look for the gear icon in the bottom right of the screen, and click the "Ubuntu with X" or similar option.
+
+#### Jetbrains IntelliJ issue
+
+For whatever reason IntelliJ (and related products like GoLand) take control of the keyboard at a lower level and ignore the xkb rules. To get IntelliJ to work, you have to turn on "Use national layouts for shortcuts" in Settings > Keymap ([reference](https://youtrack.jetbrains.com/issue/IDEA-263057)).
 
 
 ### Helpful XKB docs
