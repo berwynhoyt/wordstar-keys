@@ -1,4 +1,4 @@
-#!xkb //specify_lexicon_for_editor_display_style
+#!xkb //specify_lexicon_for_editor_display_style; tabsize=4
 
 // Define Wordstar cursor control keys using capslock as the 'control' shift key
 //
@@ -141,8 +141,9 @@ xkb_symbols "kkeys" {
 
 	// The first 4 slots in group2 of the table below should be set to NoSymbol to inherit them from qkeys above
 	// Note that the vestigal Level5 ^K key latch from enter block mode will correctly wraps because of FOUR_LEVEL group size
+	// *Note (below): when ^K is pressed immediately after ^KH block exit, then both level 3 and 5 are on, adding up to level7
 
-	// columns: { [], [^key, ^Qkey, vestigal-(^Kkey, +^Kkey), ^Kkey], [], block:[^key,  ^Qkey,   ^Kkey,  +^Kkey] };            // where ^=caps;  +=shift
+	// columns: { [], [^key, ^Qkey, vestigal-(^Kkey, +^Kkey), ^Kkey, *Note], [], block:[^key,  ^Qkey,   ^Kkey,  +^Kkey] };            // where ^=caps;  +=shift
 	// block-^Q=>Level2_Latch(=shift)
 	key <AD01> { [], [], [], [ISO_Level2_Latch, VoidSymbol] };
 	// block-^W=>ctrl-Up=0xee00(scroll_up)
@@ -158,28 +159,27 @@ xkb_symbols "kkeys" {
 	// block-^A=>shift-ctrl-Left=0xee1a(shift-ctrl-Left); block-^QA=>ctrl-h=0xee06(search)
 	key <AC01> { [], [], [], [0xee1a, 0xee06] };
 	// ^KS=>0xee0a(ctrl-s=save); block-^S=>0xee12(shift-Left); block-^QS=>0xee18(shift-Home); block-^KS=>0xee0a(ctrl-s=save)
-	key <AC02> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee0a, 0xee0a], [], [0xee12, 0xee18, 0xee0a] };
+	key <AC02> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee0a, NoSymbol, 0xee0a], [], [0xee12, 0xee18, 0xee0a] };
 	// ^KD=>0xee07(copy=duplicate_block); block-^D=>0xee13(shift-End); block-^QD=>0xee19(shift-End)
-	key <AC03> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee07], [], [0xee13, 0xee19, 0xee07] };
+	key <AC03> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee07, NoSymbol, 0xee07], [], [0xee13, 0xee19, 0xee07] };
 	// block-^F=>0xee1b(shift-ctrl-Right); block-^QF=>ctrl-F=Find
 	key <AC04> { [], [], [], [0xee1b, Find]  };
 	// ^G=>delete next char
 	key <AC05> { [], [], [], [Delete, VoidSymbol] };
 	// block-^KH=>unblock (Shift_L performs un-shiftlock); block-^H=>BackSpace; block-^KH=>end_block
-	key <AC06> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, ISO_Level5_Shift], [], [BackSpace, VoidSymbol, 0xef01] };
+	key <AC06> { [], [], [], [BackSpace, VoidSymbol, 0xef01] };
 	// ^K=>prefix_key(Level5_Latch); ^KK=>0xef03(start_block); block-^KK=>0xef01(hide_block)
-	key <AC08> { [], [ISO_Level5_Latch, VoidSymbol, NoSymbol, NoSymbol, 0xef03], [], [ISO_Level3_Latch, VoidSymbol, 0xef01] };
+	key <AC08> { [], [ISO_Level5_Latch, VoidSymbol, ISO_Level5_Latch, NoSymbol, 0xef03], [], [ISO_Level3_Latch, VoidSymbol, 0xef01] };
 	// block-^L=>F3(repeat_find)
 	key <AC09> { [], [], [], [F3, VoidSymbol] };
 	// block-^Z=>ctrl-Down=0xee01(scroll_down)
 	key <AB01> { [], [], [], [0xee01, VoidSymbol] };
 	// ^KX=>ctrl-x=0xee08(block_cut); block-^X=>0xee11(shift-Down); block-^KX=>0xee08(block_cut)
-	key <AB02> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee08], [], [0xee11, VoidSymbol, 0xee08] };
+	key <AB02> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee08, Nosymbol, 0xee08], [], [0xee11, VoidSymbol, 0xee08] };
 	// ^KC=>ctrl-x=0xee07(copy_block); block-^C=>0xee15(shift-Page_Down); block-^QC=>0xee17(shift-ctrl-End); block-^KC=>0xee08(block_cut)
-	key <AB03> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee07], [], [0xee15, 0xee17, 0xee07] };
-
-//~ 	key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
-//~ 	key <AB02> { [], [Down,p,c,v,b,n,m,l], [a,s,d,f,g,h,j,k], [q, w, r, t, y, u, i, o] }; // after ^KK: wqqqaa; after ^KH: pzzzxxx
+	key <AB03> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee07, NoSymbol, 0xee07], [], [0xee15, 0xee17, 0xee07] };
+	// ^KB=>0xef03(start_block); block-^KB=>0xef01(hide_block)
+	key <AB05> { [], [VoidSymbol, VoidSymbol, VoidSymbol, VoidSymbol, 0xef03], [], [VoidSymbol, VoidSymbol, 0xef01] };
 };
 
 // Make capslock generate the level3 modifier
