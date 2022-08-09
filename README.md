@@ -10,7 +10,8 @@ This Linux tool defines Wordstar cursor control keys in xkb using capslock as th
 * ^S/^D moves left/right; ^E/^X moves up/down; ^A/^F word left/right; ^R/^C moves page Up/Down
 * ^Q acts as a prefix, e.g. ^QS/^QD moves to Home/End of line; ^QR/^QC start/end of document
 * ^Y/^QY = delete to end of line (end of paragraph in a word processor - linux quirk)
-* ^QF is find; ^L is re-find; ^QA is replace
+* ^QF is find; ^L is re-find; ^QA is replace; ^QJ is goto line
+* ^Backspace is delete word to the right
 * ^KB/^KK turns on block marking selection mode; ^KH hides (releases) it.
 * ^KS block_save file
 * ^KY yank (i.e. cut) block; ^KC copy block

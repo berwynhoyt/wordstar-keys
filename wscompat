@@ -13,7 +13,7 @@ default partial xkb_compatibility "redirects" {
 
 	// Set up caps key to increment group
 	// Note that SetGroup(group=2) internally actually does SetGroup(group=+1); it then subtracts 1 when the key is lifted.
-	// So we use the one it actually does to avoid confusion when doing simultaneous LockGroups which this adds to
+	// So we use the syntax that shows what it actually does to avoid confusion when doing simultaneous LockGroups which this adds to
 	interpret 0xef00 { action = SetGroup(group=+1); };
 
 	// Set up ^K to latch group3
@@ -105,7 +105,7 @@ default partial xkb_compatibility "redirects" {
 	interpret 0xee1a {  // block-^A=>shift-ctrl-Left
 		action = RedirectKey(keycode=<LEFT>, clearModifiers=AltGr, modifiers=Shift+Control);
 	};
-	interpret 0xee1b {  // block-^D=>shift-ctrl-Right
+	interpret 0xee1b {  // block-^F=>shift-ctrl-Right
 		action = RedirectKey(keycode=<RGHT>, clearModifiers=AltGr, modifiers=Shift+Control);
 	};
 
@@ -137,7 +137,15 @@ default partial xkb_compatibility "redirects" {
 		action = RedirectKey(keycode=<END>, clearModifiers=AltGr, modifiers=Shift+Control);
 	};
 
-	// Make it so that ISO_Level2_Latch doesn't require the use of the shift key -- so we can use it for ^K prefix which then equals shift
+	interpret 0xee1c {  // ^QJ=>ctrl-G (jump to line)
+		action = RedirectKey(keycode=<AC05>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
+	interpret 0xee1d {  // ^QJ=>ctrl-G (jump to line)
+		action = RedirectKey(keycode=<DELE>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
+	// Make it so that ISO_Level2_Latch doesn't require the use of the shift key -- so we can use it for ^Q prefix which then equals shift
 	interpret ISO_Level2_Latch {
 		action = LatchMods(modifiers=Shift);
 	};

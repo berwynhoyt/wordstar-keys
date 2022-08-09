@@ -5,7 +5,8 @@
 // e.g. ^S/^D moves left/right; ^E/^X moves up/down; ^A/^F word left/right; ^R/^C moves page Up/Down
 // and ^Q acts as a prefix, e.g. ^QS/^QD moves to Home/End of line; ^QR/^QC start/end of document
 // ^Y/^QY = delete to end of line (end of paragraph in a word processor - linux quirk)
-// ^QF is find; ^L is re-find; ^QA is replace
+// ^QF is find; ^L is re-find; ^QA is replace; ^QJ is goto line
+// ^Backspace is delete word to the right
 // ^KB/^KK turns on block marking selection mode; ^KH hides (releases) it.
 // ^KS block_save file
 // ^KY yank_block(i.e. cut); ^KC copy block
@@ -21,13 +22,6 @@
 //  ^QE/^QX (top/bottom of page): there is no standard function to do this in linux
 //	^W/^Z (scroll up/down) issues ctrl-Up/Down which works in my editor but in few other apps.
 //  ^KX/^KC automatically exit block mode afterward
-
-// X Keyboard file format is poorly documented in many places. I found the following to be most useful.
-// The first half of the first doc will help you understand this file:
-//   https://www.x.org/archive/X11R7.6/doc/xorg-docs/input/XKB-Enhancing.html
-//      (Note replacements for rotten links therein: https://web.archive.org/web/20021213091011/http://www.tsu.ru/~pascal/en/xkb/)
-//   https://www.charvolant.org/doug/xkb/html/xkb.html
-//   https://wiki.archlinux.org/title/X_keyboard_extension
 
 // Main import: wordstar(keys)
 default partial modifier_keys alphanumeric_keys
@@ -58,10 +52,11 @@ xkb_symbols "qkeys" {
 	//		actions[Group1] = [RedirectKey(keycode=<QWER>, clearModifiers=AltGr+Shift, modifiers=Control), RedirectKey(...), ...],
 	//		actions[Group...] = [...] };   // notice lack of comma after the last []
 
-	// Note2: Beware that I tried making caps key a level3_latch, but for some reason it clears cells in google sheets -- annoying!
-	// So it's a group_latch instead.
+	// Note2: Beware that I tried making caps key a level3_latch and a level5_latch (see 'experiments' directory), but for some reason
+	// it clears cells in google sheets -- annoying! So it's a group_latch instead.
 
 	// Note3 keycode meanings: <AD02> is the W key: D means row D (spacebar row is row A) and key number 01 = 1 key from the left (i.e. from tab).
+	// Other specially named keys like <BKSP> are defined in /usr/share/X11/xkb/keycodes/evdev
 
 	replace "wordstar(caps_key)"	// Make caps key a group2 latch
 
@@ -95,6 +90,8 @@ xkb_symbols "qkeys" {
 	key <AC05> { [], [Delete, VoidSymbol, Delete, VoidSymbol] };
 	// ^H=>Backspace
 	key <AC06> { [], [BackSpace, VoidSymbol, BackSpace, VoidSymbol] };
+	// ^QJ=>Jump to line
+	key <AC07> { [], [NoSymbol, 0xee1c, NoSymbol, 0xee1c] };
 	// ^L=>F3(repeat_find)
 	key <AC09> { [], [F3, VoidSymbol, F3, VoidSymbol] };
 	// ^P=>0xee0e(ctrl-p=print)
@@ -107,7 +104,8 @@ xkb_symbols "qkeys" {
 	key <AB03> { [], [Page_Down, 0xee03, Page_Down, 0xee03] };
 	// ^N=>insert_line
 	key <AB06> { [], [Return, VoidSymbol, Return, VoidSymbol] };
-	// Tried and fail to redefine ^BackSpace=>0xee0f(ctrl-BackSpace)
+	// ^Backspace=>0xee1d(ctrl-Del)
+	key <BKSP> { [], [0xee1d] };
 };
 
 // Wordstar keys with caps-k prefix
@@ -126,8 +124,8 @@ xkb_symbols "kkeys" {
 
 	//caps=group+1
 	//^Q=Level2_Latch (i.e. Shift)
-	//^K=Level3_Latch (block mode)
-	//^K=Level5_Latch (non-block mode -- this must be different than in block mode so we can distinguish the false carryover ^K latch)
+	//^K=Level3_Latch in block mode
+	//^K=Level5_Latch in non-block mode -- this must be different than in block mode so we can distinguish the false carryover ^K latch
 	//^KK=Group3_Lock (added to caps' +1 group to produce Group4. Leave Group3 array empty to revert to Group1 if user lifts caps by accident)
 
 	name[Group4] = "ws-mark-keys";
