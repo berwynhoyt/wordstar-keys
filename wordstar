@@ -164,9 +164,9 @@ xkb_symbols "kkeys" {
 	key <AC04> { [], [], [], [0xee1b, Find]  };
 	// ^G=>delete next char
 	key <AC05> { [], [], [], [Delete, VoidSymbol] };
-	// block-^KH=>unblock (Shift_L performs un-shiftlock); block-^H=>BackSpace; block-^KH=>end_block
-	key <AC06> { [], [], [], [BackSpace, VoidSymbol, 0xef01] };
-	// ^K=>prefix_key(Level5_Latch); ^KK=>0xef03(start_block); block-^KK=>0xef01(hide_block)
+	// block-^KH=>unblock (Shift_L performs un-shiftlock); block-^H=>BackSpace; block-^KH=>un_block(hide)
+	key <AC06> { [], [], [], [ISO_Level3_Latch, VoidSymbol, 0xef01] };
+	// ^K=>prefix_key(Level5_Latch); ^KK=>0xef03(start_block); block-^KK=>0xef01(un_block)
 	key <AC08> { [], [ISO_Level5_Latch, VoidSymbol, ISO_Level5_Latch, NoSymbol, 0xef03], [], [ISO_Level3_Latch, VoidSymbol, 0xef01] };
 	// block-^L=>F3(repeat_find)
 	key <AC09> { [], [], [], [F3, VoidSymbol] };
