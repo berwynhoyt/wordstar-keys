@@ -145,6 +145,14 @@ default partial xkb_compatibility "redirects" {
 		action = RedirectKey(keycode=<DELE>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
+	interpret 0xee20 {  // ^B=>ctrl-B (bold)
+		action = RedirectKey(keycode=<AB05>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
+	interpret 0xee21 {  // ^I=>ctrl-I (italic)
+		action = RedirectKey(keycode=<AD08>, clearModifiers=AltGr+Shift, modifiers=Control);
+	};
+
 	// Make it so that ISO_Level2_Latch doesn't require the use of the shift key -- so we can use it for ^Q prefix which then equals shift
 	interpret ISO_Level2_Latch {
 		action = LatchMods(modifiers=Shift);

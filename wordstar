@@ -6,12 +6,15 @@
 // and ^Q acts as a prefix, e.g. ^QS/^QD moves to Home/End of line; ^QR/^QC start/end of document
 // ^Y/^QY = delete to end of line (end of paragraph in a word processor - linux quirk)
 // ^QF is find; ^L is re-find; ^QA is replace; ^QJ is goto line
-// ^Backspace is delete word to the right
 // ^KB/^KK turns on block marking selection mode; ^KH hides (releases) it.
 // ^KS block_save file
 // ^KY yank_block(i.e. cut); ^KC copy block
 // ^KP block_paste -- not wordstar standard which doesn't have paste
 
+// Extra non-wordstar keys:
+// ^Backspace is delete word to the right
+// ^B is bold (=ctrl-B)
+// ^I is italic (=ctrl-I)
 
 // Implementation quirks
 //
@@ -78,6 +81,8 @@ xkb_symbols "qkeys" {
 	key <AD04> { [], [Page_Up, 0xee02, Page_Up, 0xee02] };
 	// ^Y/^QY=>ctrl-Shift-Delete=0xee0b(delete_to_end_of_line/para)
 	key <AD06> { [], [0xee0b, 0xee0b, 0xee0b, 0xee0b] };
+	// ^I=>0xee21(ctrl-I: italic)
+	key <AD08> { [], [0xee21] };
 	// ^A=>ctrl-Left=0xee04(word_left); ^QA=>ctrl-h=0xee06(search)
 	key <AC01> { [], [0xee04, 0xee06, 0xee04, 0xee06] };
 	// ^S=>Left; ^QS=>0xee0c(Home)
@@ -102,6 +107,8 @@ xkb_symbols "qkeys" {
 	key <AB02> { [], [Down, VoidSymbol, Down, VoidSymbol] };
 	// ^C=>Page_Down; ^QC->0xee03(ctrl-End)
 	key <AB03> { [], [Page_Down, 0xee03, Page_Down, 0xee03] };
+	// ^B=>0xee20(ctrl-B: bold)
+	key <AB05> { [], [0xee20] };
 	// ^N=>insert_line
 	key <AB06> { [], [Return, VoidSymbol, Return, VoidSymbol] };
 	// ^Backspace=>0xee1d(ctrl-Del)
@@ -152,6 +159,8 @@ xkb_symbols "kkeys" {
 	key <AD04> { [], [], [], [0xee14, 0xee16] };
 	// ^Y/^QY=0xee0b(delete_to_end_of_line); ^KY=>ctrl-x=0xee08(yank_block=cut);
 	key <AD06> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee08], [], [0xee0b, 0xee0b, 0xee08] };
+	// block-^I=>0xee21(ctrl-I: italic)
+	key <AD08> { [], [], [], [0xee21] };
 	// ^P=>0xee0e(ctrl-p=print); ^KP=>0xee09(block_paste=paste)
 	key <AD10> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee09], [], [0xee0e, NoSymbol, 0xee09] };
 	// block-^A=>shift-ctrl-Left=0xee1a(shift-ctrl-Left); block-^QA=>ctrl-h=0xee06(search)
@@ -177,7 +186,7 @@ xkb_symbols "kkeys" {
 	// ^KC=>ctrl-x=0xee07(copy_block); block-^C=>0xee15(shift-Page_Down); block-^QC=>0xee17(shift-ctrl-End); block-^KC=>0xee08(block_cut)
 	key <AB03> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee07, NoSymbol, 0xee07], [], [0xee15, 0xee17, 0xee07] };
 	// ^KB=>0xef03(start_block); block-^KB=>0xef01(hide_block)
-	key <AB05> { [], [VoidSymbol, VoidSymbol, VoidSymbol, VoidSymbol, 0xef03], [], [VoidSymbol, VoidSymbol, 0xef01] };
+	key <AB05> { [], [NoSymbol, VoidSymbol, VoidSymbol, VoidSymbol, 0xef03], [], [0xee20, VoidSymbol, 0xef01] };
 };
 
 // Make capslock generate the level3 modifier
