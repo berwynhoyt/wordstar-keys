@@ -157,7 +157,7 @@ xkb_symbols "kkeys" {
 	key <AD03> { [], [], [], [0xee10, VoidSymbol] };
 	// block-^R=>0xee14(shift-Page_Up)
 	key <AD04> { [], [], [], [0xee14, 0xee16] };
-	// ^Y/^QY=0xee0b(delete_to_end_of_line); ^KY=>ctrl-x=0xee08(yank_block=cut);
+	// ^Y/^QY=0xee0b(delete_to_end_of_line); ^KY=>ctrl-x=0xee08(cut_block);
 	key <AD06> { [], [NoSymbol, NoSymbol, NoSymbol, NoSymbol, 0xee08], [], [0xee0b, 0xee0b, 0xee08] };
 	// block-^I=>0xee21(ctrl-I: italic)
 	key <AD08> { [], [], [], [0xee21] };
