@@ -6,26 +6,54 @@ sudo gpasswd -a $(whoami) input
 echo "Ensuring uinput device is accessible by input group"
 rule='KERNEL=="uinput", GROUP="input"'
 grep -qsv "$rule" /etc/udev/rules.d/input.rules && echo "$rule" | sudo tee /etc/udev/rules.d/input.rules >/dev/null
+echo "User $(whoami) is now set up."
 echo
-echo "Setup Complete. Now you should be able to run 'xremap wordstar'"
+
+# List latest xremap versions for optional installation
+echo "Listing latest xremap binaries for you to install"
+curl -s https://api.github.com/repos/k0kubun/xremap/releases/latest >xremaps.xml
+options=$(sed -nE "/name/s/.*\"(xremap.*zip)\".*/\1/p" xremaps.xml)
+nl <<<"$options"
+read -p "Which binary of xremap should I install in your system (Esc to skip)? " -n1 selection
+echo
+if [[ "$selection" =~ ^[0-9]$ ]]; then
+  binary_name=$(sed -n ${selection}p <<<"$options")
+  echo "Downloading and installing $binary"
+  binary_url=$(sed -nE "s/.*browser_download_url.*(https.*$binary_name)\".*/\1/p" xremaps.xml)
+  curl -fSLO $binary_url
+  unzip -o $binary_name
+  rm $binary_name
+
+  dest=~/".local/bin/xremap"
+  echo "Copying xremap to $dest"
+  systemctl --user stop xremap &>/dev/null
+  install -D xremap "$dest"
+  [[ "$(which xremap)" != "$dest" ]] && \
+      echo "The xremap on your PATH is not the same as the one I just installed" && exit 1
+fi
+rm xremaps.xml
+echo
+echo "Basic setup Complete: you should now be able to run 'xremap wordstar'"
 
 # Ask whether to install as a user service
-read -p "Shall I install wordstar keys as a user service to run it at login? (y/n)? " -n1 add_at_startup
+read -p "Shall I also install wordstar keys as a user service to run it at login? (y/n)? " -n1 add_at_startup
 echo
+key_file=~/".config/xremap/wordstar.yml"
+service_file=~/".config/systemd/user/xremap.service"
 if [ "$add_at_startup" == "y" ]; then
-  key_file=~/".config/xremap/wordstar.yml"
-  service_file=~/".config/systemd/user/xremap.service"
-
   mkdir -p `dirname $key_file`
   mkdir -p `dirname $service_file`
   echo "Copying key file to $key_file"
   cp wordstar.yml "$key_file"
   echo "Copying service file to $service_file"
   cp xremap.service "$service_file"
+fi
 
-  echo "You can now start or stop the service by typing:"
-  echo "  systemctl --user start|stop xremap"
+# Check if service is installed
+if [[ -f "$service_file" ]]; then
+  systemctl --user enable xremap  # for next boot
+  systemctl --user start xremap
   echo
-  echo "Changes to ~/.config/xremap/wordstar.yml will take immediate effect."
-  echo "Done."
+  echo "Done. You can now stop or start the service by typing:"
+  echo "  systemctl --user start|stop xremap"
 fi

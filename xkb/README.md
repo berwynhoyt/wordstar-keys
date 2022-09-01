@@ -42,7 +42,7 @@ Consequently, it's not quite perfect. But given XKB's limitations, it's pretty g
 
 ```
     git clone <this_repository> wskeys
-    cd wskeys
+    cd xkb/wskeys
     ./install
 ```
 

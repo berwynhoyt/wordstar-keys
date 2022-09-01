@@ -38,5 +38,5 @@ The disadvantage is that the installation process requires root access.
     ./install
 ```
 
-This install works for Ubuntu/Mint. For other Linux operating systems see the installation notes at [xremap](https://github.com/k0kubun/xremap).
+This install works for Ubuntu/Mint. For other Linux operating systems more tweaks are required: see the installation notes at [xremap](https://github.com/k0kubun/xremap).
 
