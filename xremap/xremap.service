@@ -1,0 +1,10 @@
+[Unit]
+Description=xremap
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=xremap --watch /home/berwyn/.config/xremap/wordstar.yml
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,101 @@
+# Credit Berwyn Hoyt: https://github.com/berwynhoyt/wskeys
+
+# Some of these are marked as not standard wordstar keys.
+# See here for all standard wordstar key bindings:
+#   http://www.wordstar.org/index.php/wsemu-documentation/wsemu-commands-and-menus/1-wordstar-emulator-full-version-command-list
+
+virtual_modifiers:
+  - CapsLock
+
+keymap:
+  - name: Wordstar
+    remap:
+      # Remove mark if switching out of this app where it might cause problems
+      Alt-tab: [Alt-tab, { set_mark: false }]
+
+      # Cursor
+      CapsLock-s: { with_mark: left }
+      CapsLock-d: { with_mark: right }
+      CapsLock-e: { with_mark: up }
+      CapsLock-x: { with_mark: down }
+      # Forward/backward word
+      #  right twice and back to fix some programs that don't move in front of the space
+      CapsLock-f: [ {with_mark: C-right}, {with_mark: C-right}, {with_mark: C-left} ] 
+      CapsLock-a: { with_mark: C-left }
+      # Page up/down
+      CapsLock-r: { with_mark: pageup }
+      CapsLock-c: { with_mark: pagedown }
+      # Insert newline
+      CapsLock-n: [enter, left]  # non-wordstar: does nothin in ws
+
+      # Delete
+      CapsLock-g: [delete, { set_mark: false }]
+      CapsLock-h: [backspace, { set_mark: false }]
+      # Delete to end of line; then delete linebreak if pressed again.
+      CapsLock-y: [Shift-end, delete, { set_mark: false }]  # non-wordstar: in ws it deletes the whole line
+      # Undo
+      CapsLock-u: [C-z, { set_mark: false }]
+      # Repeat-find
+      CapsLock-l: [F3, { set_mark: false }]    # re-find
+      # Delete next word
+      CapsLock-t: [C-Delete, { set_mark: false }]
+      CapsLock-backspace: [C-Delete, { set_mark: false }]
+      # Scroll up/down
+      CapsLock-w: C-up
+      CapsLock-z: C-down
+
+      # Non-wordstar extensions I like
+      # Italic/bold
+      CapsLock-i: C-i
+      CapsLock-b: C-b
+
+      CapsLock-q:
+        remap:
+          # Beginning/End of line
+          CapsLock-s: { with_mark: home }
+          CapsLock-d: { with_mark: end }
+          # Beginning/End of file
+          CapsLock-r: { with_mark: C-home }
+          CapsLock-c: { with_mark: C-end }
+          # Cut to end of line
+          CapsLock-y: [Shift-end, C-x, { set_mark: false }]
+          # Search
+          CapsLock-f: [C-f, { set_mark: false }]  # find
+          CapsLock-a: [C-h, { set_mark: false }]  # replace
+          # CapsLock-q u (undo)
+          u: [C-z, { set_mark: false }] 
+          # Goto line
+          j: C-g  # non-wordstar
+
+      CapsLock-k:
+        # Block marking works slightly different than with wordstar because you can only mark
+        # block beginning (^KB), not the end (^KK) is where the cursor is.
+        # However, it works pretty well using the standard ^KY as cut and adding ^KV as paste.
+        # I've also added my preferred non-standard shortcuts ^KX (cut), ^KD (copy), ^KP (paste)
+        remap:
+          # Block cut
+          CapsLock-y: [C-x, { set_mark: false }]
+          CapsLock-x: [C-x, { set_mark: false }]  # non-wordstar: in ws it exits without saving
+          # Block copy(duplicate)
+          CapsLock-c: [C-c, { set_mark: false }]  # block copy
+          CapsLock-d: [C-c, { set_mark: false }]  # non-wordstar: in ws it does save-and-close
+          # block paste
+          CapsLock-v: [C-v, { set_mark: false }]  # block move
+          CapsLock-p: [C-v, { set_mark: false }]  # non-wordstar: in ws it prints. I might revert to that in future, so don't get used to it.
+          # Mark
+          CapsLock-b: { set_mark: true }
+          CapsLock-k: { set_mark: true } # non-wordstar
+          # Hide mark
+          CapsLock-h: { set_mark: false }
+          # Save
+          CapsLock-s: C-s
+
+      # Text formatting keys
+      CapsLock-p:
+        remap:
+          # Bold
+          CapsLock-b: C-b
+          # Italic
+          CapsLock-i: C-i
+          # Print
+          CapsLock-p: C-p

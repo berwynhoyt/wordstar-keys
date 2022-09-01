@@ -1,16 +1,14 @@
 #!/bin/bash
-# install script to install wordstar keys
-# Dependencies: you must be running X Windows on Linux using xkb (typical for Ubuntu, Mint, etc.)
+# install script for xkb wordstar keys
+# Dependencies: you must be running X Windows on Linux using xkb
 
-# Unless symlinks already exists, install wordstar keys into users local config
-# The symlink is left in case you have pointed it right here into a git working copy
 echo "Creating directory tree at ~/.xkb required by xkb to load files."
 mkdir -p ~/.xkb/symbols
 mkdir -p ~/.xkb/compat
 mkdir -p ~/.local/bin
-[[ ! -L ~/.xkb/symbols/wordstar ]] && cp wordstar ~/.xkb/symbols
-[[ ! -L ~/.xkb/compat/wscompat ]] && cp wscompat ~/.xkb/compat
-[[ ! -L ~/.local/bin/wskeys ]] && cp wskeys wskeys-debug ~/.local/bin
+cp wordstar ~/.xkb/symbols
+cp wscompat ~/.xkb/compat
+cp wskeys wskeys-debug ~/.local/bin
 echo "Done."
 
 # Ask whether to make wskeys auto-load when X session starts for this user

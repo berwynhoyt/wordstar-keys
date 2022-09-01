@@ -1,0 +1,31 @@
+#!/bin/bash
+# install script for xremap wordstar keys
+
+echo "Setting up user to be able to access the keyboard device."
+sudo gpasswd -a $(whoami) input
+echo "Ensuring uinput device is accessible by input group"
+rule='KERNEL=="uinput", GROUP="input"'
+grep -qsv "$rule" /etc/udev/rules.d/input.rules && echo "$rule" | sudo tee /etc/udev/rules.d/input.rules >/dev/null
+echo
+echo "Setup Complete. Now you should be able to run 'xremap wordstar'"
+
+# Ask whether to install as a user service
+read -p "Shall I install wordstar keys as a user service to run it at login? (y/n)? " -n1 add_at_startup
+echo
+if [ "$add_at_startup" == "y" ]; then
+  key_file=~/".config/xremap/wordstar.yml"
+  service_file=~/".config/systemd/user/xremap.service"
+
+  mkdir -p `dirname $key_file`
+  mkdir -p `dirname $service_file`
+  echo "Copying key file to $key_file"
+  cp wordstar.yml "$key_file"
+  echo "Copying service file to $service_file"
+  cp xremap.service "$service_file"
+
+  echo "You can now start or stop the service by typing:"
+  echo "  systemctl --user start|stop xremap"
+  echo
+  echo "Changes to ~/.config/xremap/wordstar.yml will take immediate effect."
+  echo "Done."
+fi
