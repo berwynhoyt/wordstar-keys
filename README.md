@@ -3,7 +3,7 @@
 Arrow keys are the bane of keyboard life. You constantly have to lift your hands off the home keys to move around your software file. Wordstar cursor control keys are the answer.
 
 For Linux, I recommend the [map using xremap](xremap/README.md), but there is also a [map using xkb](xkb/README.md).
-There is also a [version for windows using Autohotkey](autohotkey/Wordstar Capslock.ahk).
+There is also a [version for windows using Autohotkey](autohotkey/Wordstar%20Capslock.ahk).
 Documentation on each of those scripts is linked above.
 
 These keyboard maps defines Wordstar cursor control keys using capslock as the 'control' key.
