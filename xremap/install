@@ -56,4 +56,5 @@ if [[ -f "$service_file" ]]; then
   echo
   echo "Done. You can now stop or start the service by typing:"
   echo "  systemctl --user start|stop xremap"
+  echo "Note: changes to keymap at ~/.config/xremap/wordstar.yml will take effect immediately"
 fi
