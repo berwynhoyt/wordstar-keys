@@ -19,7 +19,7 @@ keymap:
       CapsLock-e: { with_mark: up }
       CapsLock-x: { with_mark: down }
       # Forward/backward word
-      #  right twice and back to fix some programs that don't move in front of the space
+      #  right twice and back to fix some programs that don't move in front of the trailing space - though it does create awkwardness near end of paragraph in some programs
       CapsLock-f: [ {with_mark: C-right}, {with_mark: C-right}, {with_mark: C-left} ] 
       CapsLock-a: { with_mark: C-left }
       # Page up/down
@@ -37,9 +37,10 @@ keymap:
       CapsLock-u: [C-z, { set_mark: false }]
       # Repeat-find
       CapsLock-l: [F3, { set_mark: false }]    # re-find
-      # Delete next word
-      CapsLock-t: [C-Delete, { set_mark: false }]
-      CapsLock-backspace: [C-Delete, { set_mark: false }]
+      # Delete next word, including trailing space.
+      # Do it this long way because although Ctrl-Delete works, in some programs it doesn't delete the space.
+      CapsLock-t: [{ set_mark: false }, C-shift-right, C-shift-right, C-shift-left, Delete ]
+      CapsLock-backspace: [{ set_mark: false }, C-shift-right, C-shift-right, C-shift-left, Delete ]
       # Scroll up/down
       CapsLock-w: C-up
       CapsLock-z: C-down

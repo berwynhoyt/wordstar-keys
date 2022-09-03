@@ -1,20 +1,19 @@
-;Wordstar key map designed by Bruce Hoyt
+; Wordstar key map for AutoHotkey - designed by Bruce Hoyt
 
+; Simply install Autohotkey, then double-click this file
+; or put it in the windows startup folder to run it on startup
 ; Makes CapsLock act like WordStar 'Ctrl', but leaves Ctrl alone
-; Simply install Autohotkey, then double-click this file or
-; put it in the windows startup folder to run on startup
 
 #MaxHotkeysPerInterval 150  ; keyboard repeat can be bigger than this otherwise
 
 ; -------------------------------
-; Define the window classes in the MS Office group to use the special MS Office key overrides down below
+; Define window classes for special e.g. MS Office key overrides down below
 ; -------------------------------
 GroupAdd,MSWord,ahk_class OpusApp		; Word
 
 GroupAdd,MSOffice,ahk_group MSWord
 GroupAdd,MSOffice,ahk_class XLMAIN  		; Excel 2007
 
-;GroupAdd,WordProcessors,- Google Docs - Google Chrome
 GroupAdd,WordProcessors,ahk_group MSWord
 
 GroupAdd,Eclipse,Eclipse SDK
@@ -34,7 +33,7 @@ GroupAdd,Chrome,ahk_class Chrome_WidgetWin_1,,,Google Drive
 #SingleInstance force
 SetCapsLockState,AlwaysOff
 Menu, TRAY, Icon,%ProgramFiles%\AutoHotkey\AutoHotkey.exe,2,1
-;#NoTrayIcon  ; don't want an icon in the tray
+;#NoTrayIcon  ; include if you don't want an icon in the tray
 SetTitleMatchMode, 2  ; match anywhere in title
 
 
@@ -154,25 +153,6 @@ CapsLock & d::
   k1 =
 return
 
-; -------------------------------
-; For ?
-; -------------------------------
-
-#ifWinActive ahk_class PX_WINDOW_CLASS
-
-F3::Send ^o
-
-
-; -------------------------------
-; For Xilinx
-; -------------------------------
-#IfWinActive Xilinx - ISE
-
-; next edit window
-!n::
-  Send ^{Tab}
-return
-
 
 ; -------------------------------
 ; For FE, just translate CapsLock to Ctrl
@@ -225,10 +205,17 @@ return
 
 #IfWinActive ahk_class SALFRAME  ; OpenOffice.org
 
+; caps-b=bold; caps-kb begins marking
 CapsLock & b::
-  Send ^b{Esc}  ; Bold
-  k1 =
-  Marking =
+  {
+  if k1
+    {
+    Marking = 1
+    k1 =
+    }
+  else
+    Send ^b{Esc}  ; Bold
+  }
 return
 
 !b::
@@ -244,32 +231,6 @@ CapsLock & h::
     Marking =
     Send {Left}{Right}{Esc}	; Esc is for open office
     k1 =
-    }
-return
-
-; Ctrl+k prefix
-CapsLock & k::
-  if Marking
-    {
-    if k1
-      {
-      Marking =
-      Send {Esc}
-      k1 =
-      }
-    else
-      k1 = 1
-    }
-  else
-    {
-    if k1
-      {
-      Marking = 1
-      Send {F8}
-      k1 =
-      }
-    else
-      k1 = 1
     }
 return
 
@@ -344,9 +305,9 @@ CapsLock & t::
 return
 
 Capslock & u::
-  Send ^u{Esc}  ; Underline
-  Marking =
+  Send ^z  ; Undo
   k1 =
+  Marking =
 return
 
 ; exit all OOo windows
@@ -357,7 +318,10 @@ return
 
 CapsLock & y::
   if k1
-    Send {Home}+{End}+{Right}{Del}
+    {
+    Send +{Del}  ; Edit cut
+    Marking =
+    }
   else
   {
     saveclip := ClipboardAll
@@ -439,6 +403,14 @@ CapsLock & a::
     Send !r
   else
     Send !{Space}
+return
+
+; caps-b begins marking
+CapsLock & b::
+  if k1 {
+    Send !a
+    k1 =
+  }
 return
 
 CapsLock & c::
@@ -550,6 +522,8 @@ return
 CapsLock & y::
   if A_PriorHotKey = CapsLock & q
     Send !a{End}^k
+  else if k1
+    Send ^k
   else
     Send !a{End}{Right}^k
 return
@@ -671,7 +645,18 @@ CapsLock & a::
   k1 =
 return
 
-CapsLock & b::Send ^b
+; caps-b=bold; caps-kb begins marking
+CapsLock & b::
+  {
+  if k1
+    {
+    Marking = 1
+    k1 =
+    }
+  else
+    Send ^b
+  }
+return
 
 CapsLock & c::
   if k1
@@ -851,9 +836,9 @@ CapsLock & t::
 return
 
 Capslock & u::
-  Send ^u  ; Underline
-  Marking =
+  Send ^z  ; Undo
   k1 =
+  Marking =
 return
 
 CapsLock & BS::
@@ -890,7 +875,10 @@ return
 
 CapsLock & y::
   if k1
-    Send {Home}+{End}{Del}  ; Delete line
+    {
+    Send +{Del}  ; Edit cut
+    Marking =
+    }
   else
     Send +{End}{Del}  ; Delete to eol
   k1 =
@@ -934,10 +922,4 @@ $Esc::
     }
 else
     Send {Esc}
-return
-
-;---------- Other berwyn keys -----------
-
-;Do not close in case I get mixed up and press ^q instead of Caps-q
-^q::
 return

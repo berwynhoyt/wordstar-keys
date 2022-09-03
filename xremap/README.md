@@ -12,9 +12,11 @@ The disadvantage is that the installation process requires root access.
 
 ### Primary key definitions
 
+Note: ^ is an abbreviation for CapsLock
+
 * ^S/^D moves left/right; ^E/^X moves up/down; ^A/^F word left/right; ^R/^C moves page Up/Down; ^U undo
 * ^Q acts as a prefix, e.g. ^QS/^QD moves to Home/End of line; ^QR/^QC start/end of document
-* ^Y/^QY = delete/cut to end of line
+* ^Y/^QY = delete/cut to end of line; ^T = delete word to the right
 * ^QF is find; ^L is re-find; ^QA is replace; ^QJ is goto line
 * ^KB/^KK turns on block marking selection mode; ^KH hides it (unmark).
 * ^KS save file

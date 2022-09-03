@@ -77,8 +77,10 @@ xkb_symbols "qkeys" {
 	key <AD02> { [], [0xee00, VoidSymbol, 0xee00, VoidSymbol] };
 	// ^E=>Up
 	key <AD03> { [], [Up, VoidSymbol, Up, VoidSymbol] };
-	// ^R=>Page_Up; ^QR=>0xee02(ctrl-Home
+	// ^R=>Page_Up; ^QR=>0xee02(ctrl-Home)
 	key <AD04> { [], [Page_Up, 0xee02, Page_Up, 0xee02] };
+	// ^T=0xee1d(ctrl-Del) - delete word to the right
+	key <AD05> { [], [0xee1d, VoidSymbol, 0xee1d, VoidSymbol] };
 	// ^Y/^QY=>ctrl-Shift-Delete=0xee0b(delete_to_end_of_line/para)
 	key <AD06> { [], [0xee0b, 0xee0b, 0xee0b, 0xee0b] };
 	// ^I=>0xee21(ctrl-I: italic)
