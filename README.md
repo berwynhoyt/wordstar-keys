@@ -27,7 +27,9 @@ Note: ^ is an abbreviation for CapsLock
 * ^KS save file
 * ^KY yank (i.e. cut) block; ^KC copy block; ^KV paste block
 
-Other non-wordstar keys are defined by the specific implementations: have a look in the docs for each.
+These are the most-useful wordstar keys, though there are many others of arguable value. For a full list see this page on [wordstar.org](http://www.wordstar.org/index.php/wsemu-documentation/wsemu-commands-and-menus/1-wordstar-emulator-full-version-command-list).
+
+I have included a few other non-wordstar keys in the specific implementations for xremap, xkb, and AutoHotkey. Check their docs for specifics.
 
 ### License
 
