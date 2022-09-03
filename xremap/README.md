@@ -31,6 +31,8 @@ Note: ^ is an abbreviation for CapsLock
 * ^I is italic (=ctrl-I)
 * ^QJ goto line numberImplementation quirks
 
+As of September 2022 this is a generic wordstar mapping that works for all applications. I expect that some keys won't work perfectly with some applications, so throughout 2022 I will be updating this mapping with any application-specific tweaks that I identify.
+
 
 ## Installation
 

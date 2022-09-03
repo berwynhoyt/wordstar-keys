@@ -1,11 +1,13 @@
 # Wordstar key map (Linux or Windows)
 
-Arrow keys are the bane of keyboard life. You constantly have to lift your hands off the touch-typing home keys to move around your software file. Wordstar cursor control keys are the answer. They're easy to learn, too. They were good back in the day, and they're still the best set of cursor control keys around.
+Arrow keys are the bane of keyboard life. You constantly have to lift your hands off the touch-typing home keys to move around your software file. Wordstar cursor control keys are the answer. They let you move your cursor all around your file using intuitive motion keys that are activated simply by holding down capslock while you press them. They were good back in the day, and they're still the best set of cursor control keys around.
 
-They are similar in function to the cursor control keys defined by the emacs editor, but have the following advantages:
+The great thing about this implementation is that it works for every program in your operating system. It's like defining special keyboard shortcuts in your word processor -- except they work in all your editors and even at the command line, and in web browser apps.
+
+By way of comparison, the wordstar keys have a similar purpose to the emacs editor keys, but with the following advantages:
 
 * they are more intuitive since the arrow keys are in a key pattern you'll recognise as: up, down, left, right.
-* basic cursor motion can all happen with your left hand, leaving your right-hand free to use the mouse. (Now, why would you need to do that? But it happens.)
+* basic cursor motion can all happen with your left hand, leaving your right-hand free to use the mouse (now, why use the mouse? ... but it happens.)
 
 For Linux, I recommend the [map using xremap](xremap/README.md), but there is also a [map using xkb](xkb/README.md).
 There is also a [version for windows using Autohotkey](autohotkey/Wordstar%20Capslock.ahk).
