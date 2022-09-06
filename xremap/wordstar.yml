@@ -8,7 +8,35 @@ virtual_modifiers:
   - CapsLock
 
 keymap:
-  - name: Wordstar
+  # ~~~~ app-specific overrides must go first before the default key definitions
+  - name: word-right-override-app-specific
+    # some apps don't properly move to the next word when pressing ctrl-right;
+    # they only move to the end of the current word, before the space
+    # this makes them consistent with most editors and word-processors
+    application:
+      only:
+        - ferdium.Ferdium
+        - google-chrome.Google-chrome
+        - Navigator.firefox, Gnome-terminal
+        - typora.Typora
+    remap:
+      CapsLock-f: [ {with_mark: C-right}, {with_mark: right} ]
+      CapsLock-t: [{ set_mark: false }, C-delete, delete ]
+      CapsLock-backspace: [{ set_mark: false }, C-delete, delete ]
+
+  - name: scroll-override-app-specific
+    # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll
+    application:
+      only:
+        - scite.Scite
+        - code.Code
+    remap:
+      CapsLock-w: C-Up
+      CapsLock-z: C-Down
+
+
+  # ~~~~ Now for the main key definitions
+  - name: Main-Wordstar-Keys
     remap:
       # Remove mark if switching out of this app where it might cause problems
       Alt-tab: [Alt-tab, { set_mark: false }]
@@ -19,8 +47,7 @@ keymap:
       CapsLock-e: { with_mark: up }
       CapsLock-x: { with_mark: down }
       # Forward/backward word
-      #  right twice and back to fix some programs that don't move in front of the trailing space - though it does create awkwardness near end of paragraph in some programs
-      CapsLock-f: [ {with_mark: C-right}, {with_mark: C-right}, {with_mark: C-left} ] 
+      CapsLock-f: { with_mark: C-right }
       CapsLock-a: { with_mark: C-left }
       # Page up/down
       CapsLock-r: { with_mark: pageup }
@@ -38,12 +65,12 @@ keymap:
       # Repeat-find
       CapsLock-l: [F3, { set_mark: false }]    # re-find
       # Delete next word, including trailing space.
-      # Do it this long way because although Ctrl-Delete works, in some programs it doesn't delete the space.
-      CapsLock-t: [{ set_mark: false }, C-shift-right, C-shift-right, C-shift-left, Delete ]
-      CapsLock-backspace: [{ set_mark: false }, C-shift-right, C-shift-right, C-shift-left, Delete ]
-      # Scroll up/down
-      CapsLock-w: C-up
-      CapsLock-z: C-down
+      # Do it this long way because, although Ctrl-Delete works, in some programs it doesn't delete the space.
+      CapsLock-t: [{ set_mark: false }, C-delete ]
+      CapsLock-backspace: [{ set_mark: false }, C-Delete ]
+      # Scroll up/down. Most apps don't implement Ctrl-Up/Down
+      CapsLock-w: { launch: ["xdotool", "click", "4"] }
+      CapsLock-z: { launch: ["xdotool", "click", "5"] }
 
       # Non-wordstar extensions I like
       # Italic/bold

@@ -6,6 +6,7 @@ The advantages of this map using using **[xremap](https://github.com/k0kubun/xre
 
 * it lets you output multiple keystrokes for one input key
 * allows you to define application-specific keys
+* lets you run an external program on a keypress (e.g. scroll can be implemented using xdotool)
 * it has a simpler definition file
 
 The disadvantage is that the installation process requires root access.
@@ -33,14 +34,34 @@ Note: ^ is an abbreviation for CapsLock
 
 As of September 2022 this is a generic wordstar mapping that works for all applications. I expect that some keys won't work perfectly with some applications, so throughout 2022 I will be updating this mapping with any application-specific tweaks that I identify.
 
+### App-specific key tweaks
+
+Most of these keys will "just work" on your system. But a few keys work slightly better if xremap can detect which app you're currently typing in. You may find additional apps that need these specific tweaks. You can add your own to the wordstar.yml file. You'll see them listed near the beginning of the file. You can find the correct window title names for your own apps as [specified by xremap](https://github.com/k0kubun/xremap#x11-1).
+
+If you are using Gnome Wayland or Sway (rather than X11), your window titles might differ from mine, I'm not sure. If they are constant between systems, they could be worth contributing to my .yml file as follows.
+
+### Send me your tweaks
+
+Please contribute your app tweaks (as above) for the benefit of others. This is relatively easy to do. Even if you're not up with git, you can contribute using github's online editor:
+
+1. Simply sign up to github and you should see an edit pencil icon for [wordstar.yml](https://github.com/berwynhoyt/wordstar-keys/blob/main/xremap/wordstar.yml). 
+2. Make your changes and it will create a 'fork' of my repository in your github account. 
+3. Click the "Pull Requests" menu and the "New Pull Request" button. 
+4. Check that it looks like it's merging your fork into mine and click the "Create pull request" button. 
+5. That should about do it.
+
+Please make sure you've thoroughly tested your change first.
 
 ## Installation
 
+Simply start a terminal and type the following:
+
 ```
-    git clone <this_repository> wskeys
-    cd wskeys/xremap
+    git clone https://github.com/berwynhoyt/wordstar-keys.git
+    cd wordstar-keys/xremap
     ./install
 ```
 
-This install works for Ubuntu/Mint. For other Linux operating systems more tweaks are required: see the installation notes at [xremap](https://github.com/k0kubun/xremap).
+If you use [Gnome Wayland](https://github.com/k0kubun/xremap#gnome-wayland) (I don't), xremap may need this extra installation step provided in that link.
 
+I have tested this installer on Linux Mint, and I expect it will work on most desktop Linux distributions. If it doesn't work for your Linux and you can fix it, then please create a pull request. For other Linux operating systems, more tweaks are required: see the installation notes at [xremap](https://github.com/k0kubun/xremap).
