@@ -23,6 +23,7 @@ Note: ^ is an abbreviation for CapsLock
 * ^KS save file
 * ^KY yank (i.e. cut) block; ^KC copy block; ^KV paste block
 * ^PB bold; ^PI italic
+* ^W/^Z scroll up and down (these only work if you have xdotool installed)
 
 #### Extra non-wordstar keys defined:
 * ^N insert line break to the right

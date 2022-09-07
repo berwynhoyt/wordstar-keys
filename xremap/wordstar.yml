@@ -20,9 +20,9 @@ keymap:
         - Navigator.firefox, Gnome-terminal
         - typora.Typora
     remap:
-      CapsLock-f: [ {with_mark: C-right}, {with_mark: right} ]
-      CapsLock-t: [{ set_mark: false }, C-delete, delete ]
-      CapsLock-backspace: [{ set_mark: false }, C-delete, delete ]
+      CapsLock-f: [{with_mark: C-right}, {with_mark: right} ]
+      CapsLock-t: [{set_mark: false}, C-delete, delete ]
+      CapsLock-backspace: [{set_mark: false}, C-delete, delete ]
 
   - name: scroll-override-app-specific
     # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll
@@ -39,38 +39,42 @@ keymap:
   - name: Main-Wordstar-Keys
     remap:
       # Remove mark if switching out of this app where it might cause problems
-      Alt-tab: [Alt-tab, { set_mark: false }]
+      Alt-tab: [Alt-tab, {set_mark: false}]
 
       # Cursor
-      CapsLock-s: { with_mark: left }
-      CapsLock-d: { with_mark: right }
-      CapsLock-e: { with_mark: up }
-      CapsLock-x: { with_mark: down }
+      CapsLock-s: {with_mark: left}
+      CapsLock-d: {with_mark: right}
+      CapsLock-e: {with_mark: up}
+      CapsLock-x: {with_mark: down}
       # Forward/backward word
-      CapsLock-f: { with_mark: C-right }
-      CapsLock-a: { with_mark: C-left }
+      CapsLock-f: {with_mark: C-right}
+      CapsLock-a: {with_mark: C-left}
       # Page up/down
-      CapsLock-r: { with_mark: pageup }
-      CapsLock-c: { with_mark: pagedown }
+      CapsLock-r: {with_mark: pageup}
+      CapsLock-c: {with_mark: pagedown}
       # Insert newline
       CapsLock-n: [enter, left]  # non-wordstar: does nothin in ws
 
       # Delete
-      CapsLock-g: [delete, { set_mark: false }]
-      CapsLock-h: [backspace, { set_mark: false }]
+      CapsLock-g: [delete, {set_mark: false}]
+      CapsLock-h: [backspace, {set_mark: false}]
       # Delete to end of line; then delete linebreak if pressed again.
-      CapsLock-y: [Shift-end, delete, { set_mark: false }]  # non-wordstar: in ws it deletes the whole line
+      CapsLock-y: [Shift-end, delete, {set_mark: false}]  # non-wordstar: in ws it deletes the whole line
       # Undo
-      CapsLock-u: [C-z, { set_mark: false }]
+      CapsLock-u: [C-z, {set_mark: false}]
       # Repeat-find
-      CapsLock-l: [F3, { set_mark: false }]    # re-find
+      CapsLock-l: [F3, {set_mark: false}]    # re-find
       # Delete next word, including trailing space.
       # Do it this long way because, although Ctrl-Delete works, in some programs it doesn't delete the space.
-      CapsLock-t: [{ set_mark: false }, C-delete ]
-      CapsLock-backspace: [{ set_mark: false }, C-Delete ]
+      CapsLock-t: [{set_mark: false}, C-delete ]
+      CapsLock-backspace: [{set_mark: false}, C-Delete ]
+
       # Scroll up/down. Most apps don't implement Ctrl-Up/Down
-      CapsLock-w: { launch: ["xdotool", "click", "4"] }
-      CapsLock-z: { launch: ["xdotool", "click", "5"] }
+      # The following complex command could be simply 'xdotool click 4'
+      # except that operates on the window under the mouse, not the active window.
+      # So, instead, we have to: save mouse location, move mouse to active window, scroll, restore mouse
+      CapsLock-w: {launch: ['xdotool', 'getactivewindow', 'mousemove', '0', '0', 'mousemove', '--window', '%1', '20', '20', 'click', '4', 'mousemove', 'restore']}
+      CapsLock-z: {launch: ['xdotool', 'getactivewindow', 'mousemove', '0', '0', 'mousemove', '--window', '%1', '20', '20', 'click', '5', 'mousemove', 'restore']}
 
       # Non-wordstar extensions I like
       # Italic/bold
@@ -80,18 +84,18 @@ keymap:
       CapsLock-q:
         remap:
           # Beginning/End of line
-          CapsLock-s: { with_mark: home }
-          CapsLock-d: { with_mark: end }
+          CapsLock-s: {with_mark: home}
+          CapsLock-d: {with_mark: end}
           # Beginning/End of file
-          CapsLock-r: { with_mark: C-home }
-          CapsLock-c: { with_mark: C-end }
+          CapsLock-r: {with_mark: C-home}
+          CapsLock-c: {with_mark: C-end}
           # Cut to end of line
-          CapsLock-y: [Shift-end, C-x, { set_mark: false }]
+          CapsLock-y: [Shift-end, C-x, {set_mark: false}]
           # Search
-          CapsLock-f: [C-f, { set_mark: false }]  # find
-          CapsLock-a: [C-h, { set_mark: false }]  # replace
+          CapsLock-f: [C-f, {set_mark: false}]  # find
+          CapsLock-a: [C-h, {set_mark: false}]  # replace
           # CapsLock-q u (undo)
-          u: [C-z, { set_mark: false }] 
+          u: [C-z, {set_mark: false}] 
           # Goto line
           j: C-g  # non-wordstar
 
@@ -102,19 +106,19 @@ keymap:
         # I've also added my preferred non-standard shortcuts ^KX (cut), ^KD (copy), ^KP (paste)
         remap:
           # Block cut
-          CapsLock-y: [C-x, { set_mark: false }]
-          CapsLock-x: [C-x, { set_mark: false }]  # non-wordstar: in ws it exits without saving
+          CapsLock-y: [C-x, {set_mark: false}]
+          CapsLock-x: [C-x, {set_mark: false}]  # non-wordstar: in ws it exits without saving
           # Block copy(duplicate)
-          CapsLock-c: [C-c, { set_mark: false }]  # block copy
-          CapsLock-d: [C-c, { set_mark: false }]  # non-wordstar: in ws it does save-and-close
+          CapsLock-c: [C-c, {set_mark: false}]  # block copy
+          CapsLock-d: [C-c, {set_mark: false}]  # non-wordstar: in ws it does save-and-close
           # block paste
-          CapsLock-v: [C-v, { set_mark: false }]  # block move
-          CapsLock-p: [C-v, { set_mark: false }]  # non-wordstar: in ws it prints. I might revert to that in future, so don't get used to it.
+          CapsLock-v: [C-v, {set_mark: false}]  # block move
+          CapsLock-p: [C-v, {set_mark: false}]  # non-wordstar: in ws it prints. I might revert to that in future, so don't get used to it.
           # Mark
-          CapsLock-b: { set_mark: true }
-          CapsLock-k: { set_mark: true } # non-wordstar
+          CapsLock-b: {set_mark: true}
+          CapsLock-k: {set_mark: true} # non-wordstar
           # Hide mark
-          CapsLock-h: { set_mark: false }
+          CapsLock-h: {set_mark: false}
           # Save
           CapsLock-s: C-s
 
