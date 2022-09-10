@@ -72,9 +72,9 @@ keymap:
       # Scroll up/down. Most apps don't implement Ctrl-Up/Down
       # The following complex command could be simply 'xdotool click 4'
       # except that operates on the window under the mouse, not the active window.
-      # So, instead, we have to: save mouse location, move mouse to active window, scroll, restore mouse
-      CapsLock-w: {launch: ['xdotool', 'getactivewindow', 'mousemove', '0', '0', 'mousemove', '--window', '%1', '20', '20', 'click', '4', 'mousemove', 'restore']}
-      CapsLock-z: {launch: ['xdotool', 'getactivewindow', 'mousemove', '0', '0', 'mousemove', '--window', '%1', '20', '20', 'click', '5', 'mousemove', 'restore']}
+      # So, instead, we have to: save mouse location, move mouse to active window but under the menu bars, scroll, restore mouse
+      CapsLock-w: {launch: ['xdotool', 'getactivewindow', 'mousemove', '0', '0', 'mousemove', '--window', '%1', '20', '130', 'click', '4', 'mousemove', 'restore']}
+      CapsLock-z: {launch: ['xdotool', 'getactivewindow', 'mousemove', '0', '0', 'mousemove', '--window', '%1', '20', '130', 'click', '5', 'mousemove', 'restore']}
 
       # Non-wordstar extensions I like
       # Italic/bold
