@@ -35,7 +35,15 @@ rm xremaps.xml
 echo
 echo "Basic setup Complete: you should now be able to run 'xremap wordstar'"
 
+# Ask whether to install xdotool
+install_tool=apt-get
+[ -`which apt-getx`- == -""- ] && install_tool=yum
+read -p "Shall I also '$install_tool install xdotool' so that ^W/^Z scroll keys work? (y/n)? " -n1 xdotool
+echo
+[ "$xdotool" == "y" ] && sudo $install_tool install xdotool
+
 # Ask whether to install as a user service
+echo
 read -p "Shall I also install wordstar keys as a user service to run it at login? (y/n)? " -n1 add_at_startup
 echo
 key_file=~/".config/xremap/wordstar.yml"
