@@ -33,11 +33,13 @@ if [[ "$selection" =~ ^[0-9]$ ]]; then
 fi
 rm xremaps.xml
 echo
+echo "If you use Wayland you will also want to install this extension to enable app-specific keys:"
+echo "   https://github.com/xremap/xremap-gnome"
 echo "Basic setup Complete: you should now be able to run 'xremap wordstar'"
 
 # Ask whether to install xdotool
 install_tool=apt-get
-[ -`which apt-getx`- == -""- ] && install_tool=yum
+[ -`which apt-get`- == -""- ] && install_tool=yum
 read -p "Shall I also '$install_tool install xdotool' so that ^W/^Z scroll keys work? (y/n)? " -n1 xdotool
 echo
 [ "$xdotool" == "y" ] && sudo $install_tool install xdotool
