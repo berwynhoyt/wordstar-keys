@@ -5,7 +5,7 @@ echo "Setting up user to be able to access the keyboard device."
 sudo gpasswd -a $(whoami) input
 echo "Ensuring uinput device is accessible by input group"
 rule='KERNEL=="uinput", GROUP="input"'
-grep -qsv "$rule" /etc/udev/rules.d/input.rules && echo "$rule" | sudo tee /etc/udev/rules.d/input.rules >/dev/null
+! grep -qs "$rule" /etc/udev/rules.d/input.rules && echo "$rule" | sudo tee /etc/udev/rules.d/input.rules >/dev/null
 echo "User $(whoami) is now set up."
 echo
 
