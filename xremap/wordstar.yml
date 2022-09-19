@@ -17,7 +17,8 @@ keymap:
       only:
         - ferdium.Ferdium
         - google-chrome.Google-chrome
-        - Navigator.firefox, Gnome-terminal
+        - Navigator.firefox
+        - gnome-terminal-server.Gnome-terminal
         - typora.Typora
     remap:
       CapsLock-f: [{with_mark: C-right}, {with_mark: right} ]
@@ -33,6 +34,15 @@ keymap:
     remap:
       CapsLock-w: C-Up
       CapsLock-z: C-Down
+
+  - name: scroll-override-Gnome-terminal
+    # Gnome terminal implements scroll using Ctrl-Shift-Up/down
+    application:
+      only:
+        - gnome-terminal-server.Gnome-terminal
+    remap:
+      CapsLock-w: C-Shift-Up
+      CapsLock-z: C-Shift-Down
 
 
   # ~~~~ Now for the main key definitions
