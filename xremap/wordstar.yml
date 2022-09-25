@@ -9,21 +9,42 @@ virtual_modifiers:
 
 keymap:
   # ~~~~ app-specific overrides must go first before the default key definitions
-  - name: word-right-override-app-specific
+  # You can discover app names to use below using the instructions for your OS at: https://github.com/k0kubun/xremap#x11-1
+
+  - name: common-app-quirks
     # some apps don't properly move to the next word when pressing ctrl-right;
     # they only move to the end of the current word, before the space
     # this makes them consistent with most editors and word-processors
     application:
       only:
-        - ferdium.Ferdium
         - google-chrome.Google-chrome
         - Navigator.firefox
         - gnome-terminal-server.Gnome-terminal
         - typora.Typora
     remap:
-      CapsLock-f: [{with_mark: C-right}, {with_mark: right} ]
-      CapsLock-t: [{set_mark: false}, C-delete, delete ]
-      CapsLock-backspace: [{set_mark: false}, C-delete, delete ]
+      CapsLock-f: &right_to_next_word [{with_mark: C-right}, {with_mark: right}]
+      #Delete-next-word (incuding trailing space).
+      # Use text marking to achieve a one-key undo
+      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, delete]
+      CapsLock-t: *del_next_word
+
+  - name: ferdium-quirks
+    application:
+      only:
+        - ferdium.Ferdium
+    remap:
+      CapsLock-f: *right_to_next_word
+      #Delete using select-text + delete doesn't work reliably in Ferdium: some timing issue
+      #Oddly, select-test + space + backspace works fine --
+      #though it does make for a 2-key undo.
+      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, space, backspace]
+      CapsLock-t: *del_next_word
+      #Make delete-to-end-of-line work properly in Ferdium
+      CapsLock-y: &del_to_line_end [{set_mark: false}, Shift-end, space, backspace]  # non-wordstar: in ws it deletes the whole line
+      CapsLock-q:
+        remap:
+          # Cut to end of line doesn't work in Ferdium, so replace with delete to end of line
+          CapsLock-y: *del_to_line_end
 
   - name: scroll-override-app-specific
     # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll
@@ -49,7 +70,7 @@ keymap:
   - name: Main-Wordstar-Keys
     remap:
       # Remove mark if switching out of this app where it might cause problems
-      Alt-tab: [Alt-tab, {set_mark: false}]
+      Alt-tab: [{set_mark: false}, Alt-tab]
 
       # Cursor
       CapsLock-s: {with_mark: left}
@@ -69,13 +90,12 @@ keymap:
       CapsLock-g: [delete, {set_mark: false}]
       CapsLock-h: [backspace, {set_mark: false}]
       # Delete to end of line; then delete linebreak if pressed again.
-      CapsLock-y: [Shift-end, delete, {set_mark: false}]  # non-wordstar: in ws it deletes the whole line
+      CapsLock-y: [{set_mark: false}, Shift-end, delete]  # non-wordstar: in ws it deletes the whole line
       # Undo
-      CapsLock-u: [C-z, {set_mark: false}]
+      CapsLock-u: [{set_mark: false}, C-z]
       # Repeat-find
-      CapsLock-l: [F3, {set_mark: false}]    # re-find
+      CapsLock-l: [{set_mark: false}, F3]    # re-find
       # Delete next word, including trailing space.
-      # Do it this long way because, although Ctrl-Delete works, in some programs it doesn't delete the space.
       CapsLock-t: [{set_mark: false}, C-delete ]
       CapsLock-backspace: [{set_mark: false}, C-Delete ]
 
@@ -100,12 +120,12 @@ keymap:
           CapsLock-r: {with_mark: C-home}
           CapsLock-c: {with_mark: C-end}
           # Cut to end of line
-          CapsLock-y: [Shift-end, C-x, {set_mark: false}]
+          CapsLock-y: [{set_mark: false}, Shift-end, C-x]
           # Search
-          CapsLock-f: [C-f, {set_mark: false}]  # find
-          CapsLock-a: [C-h, {set_mark: false}]  # replace
+          CapsLock-f: [{set_mark: false}, C-f]  # find
+          CapsLock-a: [{set_mark: false}, C-h]  # replace
           # CapsLock-q u (undo)
-          u: [C-z, {set_mark: false}] 
+          u: [{set_mark: false}, C-z] 
           # Goto line
           j: C-g  # non-wordstar
 
@@ -119,16 +139,16 @@ keymap:
           CapsLock-y: [C-x, {set_mark: false}]
           CapsLock-x: [C-x, {set_mark: false}]  # non-wordstar: in ws it exits without saving
           # Block copy(duplicate)
-          CapsLock-c: [C-c, {set_mark: false}]  # block copy
-          CapsLock-d: [C-c, {set_mark: false}]  # non-wordstar: in ws it does save-and-close
+          CapsLock-c: [C-c, {set_mark: false}, up, down]  # block copy - up/down removes the visibl mark
+          CapsLock-d: [C-c, {set_mark: false}, up, down]  # non-wordstar: in ws it does save-and-close
           # block paste
-          CapsLock-v: [C-v, {set_mark: false}]  # block move
+          CapsLock-v: [C-v, {set_mark: false}]  # use wordstar's key for 'block move'
           CapsLock-p: [C-v, {set_mark: false}]  # non-wordstar: in ws it prints. I might revert to that in future, so don't get used to it.
           # Mark
           CapsLock-b: {set_mark: true}
           CapsLock-k: {set_mark: true} # non-wordstar
           # Hide mark
-          CapsLock-h: {set_mark: false}
+          CapsLock-h: [{set_mark: false}, up, down]
           # Save
           CapsLock-s: C-s
 
