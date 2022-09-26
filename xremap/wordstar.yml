@@ -42,9 +42,25 @@ keymap:
       #Make delete-to-end-of-line work properly in Ferdium
       CapsLock-y: &del_to_line_end [{set_mark: false}, Shift-end, space, backspace]  # non-wordstar: in ws it deletes the whole line
       CapsLock-q:
+        # Cut to end of line doesn't work in Ferdium, so replace with delete to end of line
+        # but with the current version of xremap we need to completely repeat all ^Q keys below --
+        # can't just do a single-key override
         remap:
           # Cut to end of line doesn't work in Ferdium, so replace with delete to end of line
           CapsLock-y: *del_to_line_end
+          # Beginning/End of line
+          CapsLock-s: {with_mark: home}
+          CapsLock-d: {with_mark: end}
+          # Beginning/End of file
+          CapsLock-r: {with_mark: C-home}
+          CapsLock-c: {with_mark: C-end}
+          # Search
+          CapsLock-f: [{set_mark: false}, C-f]  # find
+          CapsLock-a: [{set_mark: false}, C-h]  # replace
+          # CapsLock-q u (undo)
+          u: [{set_mark: false}, C-z]
+          # Goto line
+          j: C-g  # non-wordstar
 
   - name: scroll-override-app-specific
     # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll
@@ -113,19 +129,19 @@ keymap:
 
       CapsLock-q:
         remap:
+          # Cut to end of line
+          CapsLock-y: [{set_mark: false}, Shift-end, C-x]
           # Beginning/End of line
           CapsLock-s: {with_mark: home}
           CapsLock-d: {with_mark: end}
           # Beginning/End of file
           CapsLock-r: {with_mark: C-home}
           CapsLock-c: {with_mark: C-end}
-          # Cut to end of line
-          CapsLock-y: [{set_mark: false}, Shift-end, C-x]
           # Search
           CapsLock-f: [{set_mark: false}, C-f]  # find
           CapsLock-a: [{set_mark: false}, C-h]  # replace
           # CapsLock-q u (undo)
-          u: [{set_mark: false}, C-z] 
+          u: [{set_mark: false}, C-z]
           # Goto line
           j: C-g  # non-wordstar
 
