@@ -22,7 +22,7 @@ keymap:
         - gnome-terminal-server.Gnome-terminal
         - typora.Typora
     remap:
-      CapsLock-f: &right_to_next_word [{with_mark: C-right}, {with_mark: right}]
+      CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
       #Delete-next-word (incuding trailing space).
       # Use text marking to achieve a one-key undo
       CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, delete]
@@ -33,7 +33,7 @@ keymap:
       only:
         - ferdium.Ferdium
     remap:
-      CapsLock-f: *right_to_next_word
+      CapsLock-f: *word_right
       #Delete using select-text + delete doesn't work reliably in Ferdium: some timing issue
       #Oddly, select-test + space + backspace works fine --
       #though it does make for a 2-key undo.
