@@ -44,6 +44,8 @@ echo "Basic setup Complete: you should now be able to run 'xremap wordstar'"
 # Ask whether to install xdotool
 install_tool=apt-get
 [ -`which apt-get`- == -""- ] && install_tool=yum
+echo
+echo "Note: xdotool doesn't work on Wayland. But if you're not using Wayland you might want to install it"
 read -p "Shall I also '$install_tool install xdotool' so that ^W/^Z scroll keys work? (y/n)? " -n1 xdotool
 echo
 [ "$xdotool" == "y" ] && sudo $install_tool install xdotool
