@@ -4,6 +4,9 @@
 # See here for all standard wordstar key bindings:
 #   http://www.wordstar.org/index.php/wsemu-documentation/wsemu-commands-and-menus/1-wordstar-emulator-full-version-command-list
 
+# The following makes it work in wayland and in whatsapp web in chrome/firefox/ferdium
+keypress_delay_ms: 20
+
 virtual_modifiers:
   - CapsLock
 
@@ -18,49 +21,17 @@ keymap:
     application:
       only:
         - google-chrome.Google-chrome
+        - ferdium.Ferdium
         - Navigator.firefox
         - gnome-terminal-server.Gnome-terminal
         - typora.Typora
+        - xed.Xed
     remap:
       CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
       #Delete-next-word (incuding trailing space).
       # Use text marking to achieve a one-key undo
       CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, delete]
       CapsLock-t: *del_next_word
-
-  - name: ferdium-quirks
-    application:
-      only:
-        - ferdium.Ferdium
-    remap:
-      CapsLock-f: *word_right
-      #Delete using select-text + delete doesn't work reliably in Ferdium: some timing issue
-      #Oddly, select-test + space + backspace works fine --
-      #though it does make for a 2-key undo.
-      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, space, backspace]
-      CapsLock-t: *del_next_word
-      #Make delete-to-end-of-line work properly in Ferdium
-      CapsLock-y: &del_to_line_end [{set_mark: false}, Shift-end, space, backspace]  # non-wordstar: in ws it deletes the whole line
-      CapsLock-q:
-        # Cut to end of line doesn't work in Ferdium, so replace with delete to end of line
-        # but with the current version of xremap we need to completely repeat all ^Q keys below --
-        # can't just do a single-key override
-        remap:
-          # Cut to end of line doesn't work in Ferdium, so replace with delete to end of line
-          CapsLock-y: *del_to_line_end
-          # Beginning/End of line
-          CapsLock-s: {with_mark: home}
-          CapsLock-d: {with_mark: end}
-          # Beginning/End of file
-          CapsLock-r: {with_mark: C-home}
-          CapsLock-c: {with_mark: C-end}
-          # Search
-          CapsLock-f: [{set_mark: false}, C-f]  # find
-          CapsLock-a: [{set_mark: false}, C-h]  # replace
-          # CapsLock-q u (undo)
-          u: [{set_mark: false}, C-z]
-          # Goto line
-          j: C-g  # non-wordstar
 
   - name: scroll-override-app-specific
     # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll

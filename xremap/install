@@ -1,6 +1,8 @@
 #!/bin/bash
 # install script for xremap wordstar keys
 
+exec_dest="/usr/local/bin/xremap"
+
 echo "Setting up user to be able to access the keyboard device."
 sudo gpasswd -a $(whoami) input
 echo "Ensuring uinput device is accessible by input group"
@@ -11,6 +13,7 @@ echo "User $(whoami) is now set up."
 echo
 
 # List latest xremap versions for optional installation
+installed=
 echo "Listing latest xremap binaries for you to install"
 curl -s https://api.github.com/repos/k0kubun/xremap/releases/latest >xremaps.xml
 options=$(sed -nE "/name/s/.*\"(xremap.*zip)\".*/\1/p" xremaps.xml)
@@ -25,12 +28,12 @@ if [[ "$selection" =~ ^[0-9]$ ]]; then
   unzip -o $binary_name
   rm $binary_name
 
-  dest=~/".local/bin/xremap"
-  echo "Copying xremap to $dest"
+  echo "Copying xremap to $exec_dest"
   systemctl --user stop xremap &>/dev/null
-  install -D xremap "$dest"
-  [[ "$(which xremap)" != "$dest" ]] && \
-      echo "The xremap on your PATH is not the same as the one I just installed" && exit 1
+  sudo install -D xremap "$exec_dest"
+  installed=true
+else
+  exec_dest="$(which xremap)"
 fi
 rm xremaps.xml
 echo
@@ -45,6 +48,8 @@ read -p "Shall I also '$install_tool install xdotool' so that ^W/^Z scroll keys 
 echo
 [ "$xdotool" == "y" ] && sudo $install_tool install xdotool
 
+[[ ! -f "$exec_dest" ]] && echo "Unable to install xremap" && exit 1
+
 # Ask whether to install as a user service
 echo
 read -p "Shall I also install wordstar keys as a user service to run it at login? (y/n)? " -n1 add_at_startup
@@ -57,7 +62,7 @@ if [ "$add_at_startup" == "y" ]; then
   echo "Copying key file to $key_file"
   cp wordstar.yml "$key_file"
   echo "Copying service file to $service_file"
-  cp xremap.service "$service_file"
+  sed "s|ExecStart=xremap|ExecStart=$exec_dest|" xremap.service >"$service_file"
 fi
 
 # Check if service is installed
@@ -65,7 +70,14 @@ if [[ -f "$service_file" ]]; then
   systemctl --user enable xremap  # for next boot
   systemctl --user start xremap
   echo
-  echo "Done. You can now stop or start the service by typing:"
-  echo "  systemctl --user start|stop xremap"
+  echo "Service enabled. You can now start/stop/check the service by typing:"
+  echo "  systemctl --user start|stop|status xremap"
   echo "Note: changes to keymap at ~/.config/xremap/wordstar.yml will take effect immediately"
+fi
+
+# Warn if the xremap on the PATH is not the one I installed
+if [[ "$installed" != "" && "$(which xremap)" != "$exec_dest" ]]; then
+  echo
+  echo "*** Warning ***: The xremap on your PATH is not the same as the one I just installed in $exec_dest."
+  echo "You may need to remove the one at $(which xremap)"
 fi
