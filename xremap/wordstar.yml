@@ -20,12 +20,11 @@ keymap:
     # this makes them consistent with most editors and word-processors
     application:
       only:
-        - google-chrome.Google-chrome
-        - ferdium.Ferdium
-        - Navigator.firefox
-        - gnome-terminal-server.Gnome-terminal
-        - typora.Typora
-        - xed.Xed
+        - Google-chrome         # name in both Wayland and X11
+        - Ferdium               # name in both Wayland and X11
+        - firefox               # name in both Wayland and X11
+        - Typora                # name in both Wayland and X11
+        - Xed                   # name in both Wayland and X11
     remap:
       CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
       #Delete-next-word (incuding trailing space).
@@ -46,11 +45,35 @@ keymap:
   - name: scroll-override-Gnome-terminal
     # Gnome terminal implements scroll using Ctrl-Shift-Up/down
     application:
-      only:
-        - gnome-terminal-server.Gnome-terminal
+      only: [gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     remap:
+      CapsLock-f: *word_right
+      CapsLock-backspace: &del_next_word [{set_mark: false}, C-delete, delete]
+      CapsLock-t: *del_next_word
+      # specific key maps that work in readline (e.g. bash)
       CapsLock-w: C-Shift-Up
       CapsLock-z: C-Shift-Down
+      # Delete to end of line; then delete linebreak if pressed again.
+      CapsLock-y: C-k  # non-wordstar: in ws it deletes the whole line
+      Esc: [C-k, C-u]           # delete whole line like in windows
+      CapsLock-k:
+        # readline-specific (e.g. bash) block marking
+        # NOTE: requires that you put the line 'C-h: kill-region' in your ~/.inputrc (or run 'bind C-h:kill-region')
+        # Block marking works slightly different than with wordstar because you can only mark
+        # block beginning (^KB or ^KK) and the end is where the cursor is.
+        # However, it works pretty well using the standard ^KY as cut and adding ^KV as paste.
+        # I've also added my preferred non-standard shortcuts ^KX (cut), ^KD (copy), ^KP (paste)
+        remap:
+          # Block cut - make it do the same as block copy since there is no cut in Gnome terminal
+          CapsLock-y: [C-Shift-c]
+          CapsLock-x: [C-Shift-c]  # non-wordstar: in ws it exits without saving
+          # Block copy(duplicate) - only works in bash/readline
+          CapsLock-c: [C-Shift-c]
+          CapsLock-d: [C-Shift-c]
+          # block paste into Gnome terminal
+          CapsLock-v: [C-Shift-v]  # use wordstar's key for 'block move'
+          CapsLock-p: [C-Shift-v]  # non-wordstar mapping: in ws it prints. I might revert to that in future, so don't get used to it.
+          # Mark mode - there is no keyboard-initiated mark mode in Gnome Terminal
 
 
   # ~~~~ Now for the main key definitions
@@ -118,7 +141,7 @@ keymap:
 
       CapsLock-k:
         # Block marking works slightly different than with wordstar because you can only mark
-        # block beginning (^KB), not the end (^KK) is where the cursor is.
+        # block beginning (^KB or ^KK) and the end is where the cursor is.
         # However, it works pretty well using the standard ^KY as cut and adding ^KV as paste.
         # I've also added my preferred non-standard shortcuts ^KX (cut), ^KD (copy), ^KP (paste)
         remap:
