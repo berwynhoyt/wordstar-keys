@@ -43,18 +43,18 @@ keymap:
       CapsLock-z: C-Down
 
   - name: scroll-override-Gnome-terminal
-    # Gnome terminal implements scroll using Ctrl-Shift-Up/down
     application:
       only: [gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     remap:
+      C-v: C-Shift-v  # add Ctrl-v paste as well as gnome-terminal default of C-Shift-v
       CapsLock-f: *word_right
       CapsLock-backspace: &del_next_word [{set_mark: false}, C-delete, delete]
       CapsLock-t: *del_next_word
-      # specific key maps that work in readline (e.g. bash)
+      # Gnome terminal implements scroll using Ctrl-Shift-Up/down
       CapsLock-w: C-Shift-Up
       CapsLock-z: C-Shift-Down
-      # Delete to end of line; then delete linebreak if pressed again.
-      CapsLock-y: C-k  # non-wordstar: in ws it deletes the whole line
+      # specific key maps that work in readline (e.g. bash)
+      CapsLock-y: C-k  # del end-of-line; (non-wordstar: in ws it deletes the whole line)
       Esc: [C-k, C-u]           # delete whole line like in windows
       CapsLock-k:
         # readline-specific (e.g. bash) block marking
@@ -99,6 +99,9 @@ keymap:
       # Delete
       CapsLock-g: [delete, {set_mark: false}]
       CapsLock-h: [backspace, {set_mark: false}]
+      delete: [delete, {set_mark: false}]
+      backspace: [backspace, {set_mark: false}]
+
       # Delete to end of line; then delete linebreak if pressed again.
       CapsLock-y: [{set_mark: false}, Shift-end, delete]  # non-wordstar: in ws it deletes the whole line
       # Undo
