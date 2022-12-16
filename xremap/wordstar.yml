@@ -127,7 +127,7 @@ keymap:
       CapsLock-q:
         remap:
           # Cut to end of line
-          CapsLock-y: [{set_mark: false}, Shift-end, Shift-end, Shift-end, C-x] ; some apps need the repeats to 'take'
+          CapsLock-y: [{set_mark: false}, Shift-end, Shift-end, Shift-end, C-x]  # some apps need the repeats to 'take'
           # Beginning/End of line
           CapsLock-s: {with_mark: home}
           CapsLock-d: {with_mark: end}
