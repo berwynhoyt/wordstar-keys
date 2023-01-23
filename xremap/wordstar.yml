@@ -30,7 +30,7 @@ keymap:
       CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
       #Delete-next-word (incuding trailing space).
       # Use text marking to achieve a one-key undo
-      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, delete]
+      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, esc, delete] # esc necessary for a delay in some apps
       CapsLock-t: *del_next_word
 
   - name: scroll-override-app-specific

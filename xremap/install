@@ -74,6 +74,8 @@ if [[ -f "$service_file" ]]; then
   echo
   echo "Service enabled. You can now start/stop/check the service by typing:"
   echo "  systemctl --user start|stop|status xremap"
+  echo "or view the log with:"
+  echo "  journalctl --user -fu xremap"
   echo "Note: changes to keymap at ~/.config/xremap/wordstar.yml will take effect immediately"
 fi
 
