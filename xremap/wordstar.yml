@@ -25,6 +25,7 @@ keymap:
         - firefox               # name in both Wayland and X11
         - Typora                # name in both Wayland and X11
         - Xed                   # name in both Wayland and X11
+        - Zotero
     remap:
       CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
       #Delete-next-word (incuding trailing space).
