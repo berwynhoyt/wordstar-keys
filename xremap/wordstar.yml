@@ -30,7 +30,7 @@ keymap:
       CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
       #Delete-next-word (incuding trailing space).
       # Use text marking to achieve a one-key undo
-      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, shift-right, esc, delete] # esc necessary for a delay in some apps
+      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, insert, insert, shift-right, delete] # insert necessary for a delay in some apps
       CapsLock-t: *del_next_word
 
   - name: scroll-override-app-specific
@@ -75,6 +75,18 @@ keymap:
           CapsLock-v: [C-Shift-v]  # use wordstar's key for 'block move'
           CapsLock-p: [C-Shift-v]  # non-wordstar mapping: in ws it prints. I might revert to that in future, so don't get used to it.
           # Mark mode - there is no keyboard-initiated mark mode in Gnome Terminal
+
+  - name: repeat-search-libreoffice
+    application:
+      only: libreoffice-writer
+    remap:
+      CapsLock-l: [{set_mark: false}, C-Shift-f]  # Repeat search in libreoffice
+
+  - name: highlight-hotkey-in-calibre-ebook-reader
+    application:
+      only: calibre-ebook-viewer.calibre
+    remap:
+      CapsLock-h: [h, C-Enter]
 
 
   # ~~~~ Now for the main key definitions
