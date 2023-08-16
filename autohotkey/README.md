@@ -1,6 +1,6 @@
 # Wordstar key map for AutoHotkey (Windows)
 
-Arrow keys are the bane of keyboard life. You constantly have to lift your hands off the home keys to move around your software file. Wordstar cursor control keys are the answer. This Windows key map defines Wordstar cursor control keys using capslock as the 'control' key. It uses [AutoHotkey](https://www.autohotkey.com/) to do so.
+Arrow keys are the bane of keyboard life. You constantly have to lift your hands off the home keys to move around your software file. Wordstar cursor control keys are the answer. This Windows key map defines Wordstar cursor control keys using capslock as the 'control' key. It uses [AutoHotkey v1](https://www.autohotkey.com/) to do so.
 
 ### Primary key definitions
 
@@ -30,6 +30,6 @@ There are several tweaks for specific applications to make this work consistentl
 
 ## Installation
 
-Download and install [AutoHotkey](https://www.autohotkey.com/)
+Download and install [AutoHotkey v1](https://www.autohotkey.com/)
 Double-click wordstar.ahk. An icon will appear in your system tray showing that the key map is in operation.
 
