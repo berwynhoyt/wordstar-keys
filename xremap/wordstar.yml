@@ -4,6 +4,9 @@
 # See here for all standard wordstar key bindings:
 #   http://www.wordstar.org/index.php/wsemu-documentation/wsemu-commands-and-menus/1-wordstar-emulator-full-version-command-list
 
+# To discover application names, see https://github.com/k0kubun/xremap/tree/v0.8.6#x11-1
+#  On X11, run: wmctrl -x -l
+
 # The following makes it work in wayland and in whatsapp web in chrome/firefox/ferdium
 keypress_delay_ms: 20
 
@@ -12,7 +15,7 @@ virtual_modifiers:
 
 keymap:
   # ~~~~ app-specific overrides must go first before the default key definitions
-  # You can discover app names to use below using the instructions for your OS at: https://github.com/k0kubun/xremap#x11-1
+  # You can discover app names to use below using the instructions for your OS (see link above)
 
   - name: common-app-quirks
     # some apps don't properly move to the next word when pressing ctrl-right;

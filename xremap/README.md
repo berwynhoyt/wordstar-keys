@@ -45,7 +45,11 @@ The install script will install the key dependencies, xremap and xdotool, which 
     ./install
 ```
 
-If you use [Gnome Wayland](https://github.com/k0kubun/xremap#gnome-wayland) (I don't), xremap may need this extra installation step provided in that link.
+If you do install the service as above, then changes to keymap at `~/.config/xremap/wordstar.yml` will take effect immediately. If you have trouble, see Customization below.
+
+### Linux Support
+
+If you use Gnome Wayland (I don't), xremap may need [this extra installation step](https://github.com/k0kubun/xremap#gnome-wayland) provided in that link.
 
 I have tested this installer on Linux Mint, and I expect it will work on most desktop Linux distributions. If it doesn't work for your Linux and you can fix it, then please create a pull request. For other Linux operating systems, more settings may be required: see the installation notes at [xremap](https://github.com/k0kubun/xremap).
 
@@ -65,12 +69,12 @@ However, if you prefer, it is possible to edit the service's yml file live at ~/
 
 ### Send me your tweaks
 
-Please contribute your app tweaks (as above) for the benefit of others. This is relatively easy to do. Even if you're not up with git, you can contribute using github's online editor:
+If you would like to contribute your own tweaks for specific apps so that others can benefit, this is relatively easy to do. Even if you're not up with git, you can contribute using github's online editor:
 
 1. Simply sign up to github and you should see an edit pencil icon for [wordstar.yml](https://github.com/berwynhoyt/wordstar-keys/blob/main/xremap/wordstar.yml). 
 2. Make your changes and it will create a 'fork' of my repository in your github account. 
 3. Click the "Pull Requests" menu and the "New Pull Request" button. 
 4. Check that it looks like it's merging your fork into mine and click the "Create pull request" button. 
-5. That should about do it.
+5. I'll review your suggestions and merge them as appropriate.
 
 Please make sure you've thoroughly tested your change first.
