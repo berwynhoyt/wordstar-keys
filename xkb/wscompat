@@ -141,7 +141,7 @@ default partial xkb_compatibility "redirects" {
 		action = RedirectKey(keycode=<AC05>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
-	interpret 0xee1d {  // ^QJ=>ctrl-G (jump to line)
+	interpret 0xee1d {  // ^T or ^Backspace=>ctrl-Del (delete word to the right)
 		action = RedirectKey(keycode=<DELE>, clearModifiers=AltGr+Shift, modifiers=Control);
 	};
 
