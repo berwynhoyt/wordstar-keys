@@ -7,6 +7,8 @@ After=xdg-desktop-autostart.target
 [Service]
 Type=simple
 Restart=always
+# prevent logging every single key to clog up the syslog
+StandardError=null
 ExecStart=xremap --watch=config %h/.config/xremap/wordstar.yml
 
 [Install]
