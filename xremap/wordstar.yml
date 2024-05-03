@@ -5,7 +5,9 @@
 #   http://www.wordstar.org/index.php/wsemu-documentation/wsemu-commands-and-menus/1-wordstar-emulator-full-version-command-list
 
 # To discover application names, see https://github.com/k0kubun/xremap/tree/v0.8.6#x11-1
-#  On X11, run: wmctrl -x -l
+#  On X11, run: wmctrl -xl
+
+# If you have problems, print keystrokes by running with: RUST_LOG=debug xremap wordstar.yml
 
 # The following makes it work in wayland and in whatsapp web in chrome/firefox/ferdium
 keypress_delay_ms: 20
@@ -16,6 +18,17 @@ virtual_modifiers:
 keymap:
   # ~~~~ app-specific overrides must go first before the default key definitions
   # You can discover app names to use below using the instructions for your OS (see link above)
+
+  - name: Make Zoho Mail keys more compatible with Gmail
+    application:
+      only: Zoho Mail - Desktop
+    remap:
+      C-w: C-Backslash  # close tab
+      C-Shift-8: C-dot  # bullets
+      C-Shift-7: C-slash  # numbering
+      C-q: Alt-F4  # Quit app
+      C-rightbrace: C-m
+      C-leftbrace: C-Shift-m
 
   - name: common-app-quirks
     # some apps don't properly move to the next word when pressing ctrl-right;
@@ -29,11 +42,12 @@ keymap:
         - Typora                # name in both Wayland and X11
         - Xed                   # name in both Wayland and X11
         - Zotero
+        - Zoho Mail - Desktop
     remap:
       CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
       #Delete-next-word (incuding trailing space).
       # Use text marking to achieve a one-key undo
-      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, insert, insert, shift-right, delete] # insert necessary for a delay in some apps
+      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, C-shift-right, C-shift-left, insert, insert, delete] # insert necessary for a delay in some apps
       CapsLock-t: *del_next_word
 
   - name: scroll-override-app-specific
@@ -46,11 +60,24 @@ keymap:
       CapsLock-w: C-Up
       CapsLock-z: C-Down
 
+  - name: disable-esc-in-flameshot
+    # disable <Esc> in flameshot because it always exits accidentally. Instead make it switch to selection mode.
+    application:
+      only: flameshot
+    remap:
+      Esc: [a, s, s]           # delete whole line like in windows
+
   - name: scroll-override-Gnome-terminal
     application:
       only: [gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     remap:
+      CapsLock-s: {with_mark: C-b}      # bind these to emacs keys which work better than arrows in tcsh's readline
+      CapsLock-d: {with_mark: C-f}
       C-v: C-Shift-v  # add Ctrl-v paste as well as gnome-terminal default of C-Shift-v
+      C-Alt-v: C-v    # but make C-Alt-v do what C-v used to do (quoted-insert)
+      # Make Ctrl-tab and Ctrl-shift-tab switch Gnome tabs
+      C-tab: C-pagedown
+      C-Shift-tab: C-pageup
       CapsLock-f: *word_right
       CapsLock-backspace: &del_next_word [{set_mark: false}, C-delete, delete]
       CapsLock-t: *del_next_word
@@ -78,12 +105,33 @@ keymap:
           CapsLock-v: [C-Shift-v]  # use wordstar's key for 'block move'
           CapsLock-p: [C-Shift-v]  # non-wordstar mapping: in ws it prints. I might revert to that in future, so don't get used to it.
           # Mark mode - there is no keyboard-initiated mark mode in Gnome Terminal
+      # The only reason to include ^Q keys is to bind ^Q^S and ^Q^D to a sequence works better for tcsh's readline.
+      # But if you define some ^Q keys here, you have to define them all
+      CapsLock-q:
+        remap:
+          # Cut to end of line
+          CapsLock-y: [{set_mark: false}, Shift-end, Shift-end, Shift-end, C-x]  # some apps need the repeats to 'take'
+          # Beginning/End of line
+          CapsLock-s: [C-b, C-f, {with_mark: home}]
+          CapsLock-d: [C-f, C-b, {with_mark: end}]
+          # Beginning/End of file
+          CapsLock-r: {with_mark: C-home}
+          CapsLock-c: {with_mark: C-end}
+          # Search
+          CapsLock-f: [{set_mark: false}, C-f]  # find
+          CapsLock-a: [{set_mark: false}, C-h]  # replace
+          # CapsLock-q u (undo)
+          u: [{set_mark: false}, C-z]
+          # Goto line
+          j: C-g  # non-wordstar
+
 
   - name: repeat-search-libreoffice
     application:
       only: libreoffice-writer
     remap:
-      CapsLock-l: [{set_mark: false}, C-Shift-f]  # Repeat search in libreoffice
+      CapsLock-l: [{set_mark: false}, Esc, C-Shift-f]  # Repeat search in libreoffice
+      Ctrl-Shift-8: [Ctrl-Alt-8] # Libreoffice doesn't recognise Ctrl-Shift-8 in Linux so assign it to some other key so that I can assign it in Libreoffice
 
   - name: highlight-hotkey-in-calibre-ebook-reader
     application:
