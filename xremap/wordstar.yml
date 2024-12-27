@@ -9,11 +9,19 @@
 
 # If you have problems, print keystrokes by running with: RUST_LOG=debug xremap wordstar.yml
 
+# Bouncekeys note: this has been optimised to work with bouncekeys by avoiding
+# key sequences that output repetitions of the same keystroke as bouncekeys suppress
+# such keys (even control keys) iff bouncekeys is enabled after xremap is run.
+
 # The following makes it work in wayland and in whatsapp web in chrome/firefox/ferdium
 keypress_delay_ms: 20
 
 virtual_modifiers:
   - CapsLock
+
+shared:
+  word_right: &word_right [{with_mark: C-right}, {with_mark: right}]
+  del_next_word: &del_next_word [{set_mark: false}, C-delete, delete]
 
 keymap:
   # ~~~~ app-specific overrides must go first before the default key definitions
@@ -44,10 +52,10 @@ keymap:
         - Zotero
         - Zoho Mail - Desktop
     remap:
-      CapsLock-f: &word_right [{with_mark: C-right}, {with_mark: right}]
+      CapsLock-f: *word_right
       #Delete-next-word (incuding trailing space).
       # Use text marking to achieve a one-key undo
-      CapsLock-backspace: &del_next_word [{set_mark: false}, C-shift-right, C-shift-right, C-shift-left, insert, insert, delete] # insert necessary for a delay in some apps
+      CapsLock-backspace: *del_next_word
       CapsLock-t: *del_next_word
 
   - name: scroll-override-app-specific
@@ -57,8 +65,10 @@ keymap:
         - scite.Scite
         - code.Code
     remap:
-      CapsLock-w: C-Up
-      CapsLock-z: C-Down
+      # Note the following 'leftctrl' is a workaround so that keyrepeat works even with bouncekeys turned on,
+      # but note that with the keypress_delay_ms set as above, it does slow down the key repeat
+      CapsLock-w: [C-Up, leftctrl]      # Scroll up
+      CapsLock-z: [C-Down, leftctrl]    # Scroll down
 
   - name: disable-esc-in-flameshot
     # disable <Esc> in flameshot because it always exits accidentally. Instead make it switch to selection mode.
@@ -71,22 +81,22 @@ keymap:
     application:
       only: [gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     remap:
-      CapsLock-s: {with_mark: C-b}      # bind these to emacs keys which work better than arrows in tcsh's readline
-      CapsLock-d: {with_mark: C-f}
+      CapsLock-s: C-b      # bind these to emacs keys which work better than arrows in tcsh's readline
+      CapsLock-d: C-f
       C-v: C-Shift-v  # add Ctrl-v paste as well as gnome-terminal default of C-Shift-v
       C-Alt-v: C-v    # but make C-Alt-v do what C-v used to do (quoted-insert)
-      # Make Ctrl-tab and Ctrl-shift-tab switch Gnome tabs
+      # Make Ctrl-tab and Ctrl-shift-tab switch tabs in Gnome terminal
       C-tab: C-pagedown
       C-Shift-tab: C-pageup
       CapsLock-f: *word_right
-      CapsLock-backspace: &del_next_word [{set_mark: false}, C-delete, delete]
+      CapsLock-backspace: *del_next_word
       CapsLock-t: *del_next_word
       # Gnome terminal implements scroll using Ctrl-Shift-Up/down
       CapsLock-w: C-Shift-Up
       CapsLock-z: C-Shift-Down
       # specific key maps that work in readline (e.g. bash)
       CapsLock-y: C-k  # del end-of-line; (non-wordstar: in ws it deletes the whole line)
-      Esc: [C-k, C-u]           # delete whole line like in windows
+      Esc: [Home, C-k]     # delete whole line like in windows
       CapsLock-k:
         # readline-specific (e.g. bash) block marking
         # NOTE: requires that you put the line 'C-h: kill-region' in your ~/.inputrc (or run 'bind C-h:kill-region')
@@ -106,14 +116,14 @@ keymap:
           CapsLock-p: [C-Shift-v]  # non-wordstar mapping: in ws it prints. I might revert to that in future, so don't get used to it.
           # Mark mode - there is no keyboard-initiated mark mode in Gnome Terminal
       # The only reason to include ^Q keys is to bind ^Q^S and ^Q^D to a sequence works better for tcsh's readline.
-      # But if you define some ^Q keys here, you have to define them all
+      # But if you redefine some ^Q keys here, you have to define them all due to xremap quirk
       CapsLock-q:
         remap:
-          # Cut to end of line
-          CapsLock-y: [{set_mark: false}, Shift-end, Shift-end, Shift-end, C-x]  # some apps need the repeats to 'take'
+          # Cut to end of line doesn't work in terminal, so just do delete to end of line
+          CapsLock-y: [{set_mark: false}, C-k]
           # Beginning/End of line
-          CapsLock-s: [C-b, C-f, {with_mark: home}]
-          CapsLock-d: [C-f, C-b, {with_mark: end}]
+          CapsLock-s: [C-b-f, {with_mark: home}]
+          CapsLock-d: [C-f-b, {with_mark: end}]
           # Beginning/End of file
           CapsLock-r: {with_mark: C-home}
           CapsLock-c: {with_mark: C-end}
@@ -139,10 +149,10 @@ keymap:
     remap:
       CapsLock-h: [h, C-Enter]
 
-
   # ~~~~ Now for the main key definitions
   - name: Main-Wordstar-Keys
     remap:
+      space: space
       # Remove mark if switching out of this app where it might cause problems
       Alt-tab: [{set_mark: false}, Alt-tab]
 
@@ -167,7 +177,7 @@ keymap:
       backspace: [backspace, {set_mark: false}]
 
       # Delete to end of line; then delete linebreak if pressed again.
-      CapsLock-y: [{set_mark: false}, Shift-end, Shift-end, Shift-end, delete]  # non-wordstar: in ws it deletes the whole line; some apps need the repeats to 'take'
+      CapsLock-y: [{set_mark: false}, Shift-end-end, delete]  # non-wordstar: in ws it deletes the whole line; some apps need the repeated 'end' to 'take'
       # Undo
       CapsLock-u: [{set_mark: false}, C-z]
       # Repeat-find
@@ -191,7 +201,7 @@ keymap:
       CapsLock-q:
         remap:
           # Cut to end of line
-          CapsLock-y: [{set_mark: false}, Shift-end, Shift-end, Shift-end, C-x]  # some apps need the repeats to 'take'
+          CapsLock-y: [{set_mark: false}, Shift-end-end-end, C-x]  # some apps need the repeats to 'take'
           # Beginning/End of line
           CapsLock-s: {with_mark: home}
           CapsLock-d: {with_mark: end}
