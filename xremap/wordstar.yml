@@ -21,7 +21,15 @@ virtual_modifiers:
 
 shared:
   word_right: &word_right [{with_mark: C-right}, {with_mark: right}]
-  del_next_word: &del_next_word [{set_mark: false}, C-delete, delete]
+  # Note: to make del_next_word work the same on bash command line (to delete trailing spaces), put this in ~/.inputrc:
+    # Make Ctrl-right (forward word) also skip space
+    # "\e[1;5C": vi-fword
+    # Maps ^Delete to "space,C-right,C-[-h,backspace" to make it do 'kill-word' but include subsequent spaces
+    # Works everwhere except at end of command line:
+    # "\e[3;5~": " \e[1;5C\e\C-h\C-?"
+  del_next_word: &del_next_word [{set_mark: false}, C-delete]
+  # the following del_next_word doesn't work well with bouncekeys, but otherwise does work better in Chrome, google docs, etc.
+  del_next_word2: &del_next_word2 [{set_mark: false}, C-shift-right, C-shift-right, C-shift-left, control_L, control_L, delete] # 'control_L' necessary for a delay in some apps
 
 keymap:
   # ~~~~ app-specific overrides must go first before the default key definitions
@@ -55,8 +63,8 @@ keymap:
       CapsLock-f: *word_right
       #Delete-next-word (incuding trailing space).
       # Use text marking to achieve a one-key undo
-      CapsLock-backspace: *del_next_word
-      CapsLock-t: *del_next_word
+      CapsLock-backspace: *del_next_word2
+      CapsLock-t: *del_next_word2
 
   - name: scroll-override-app-specific
     # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll
@@ -88,9 +96,6 @@ keymap:
       # Make Ctrl-tab and Ctrl-shift-tab switch tabs in Gnome terminal
       C-tab: C-pagedown
       C-Shift-tab: C-pageup
-      CapsLock-f: *word_right
-      CapsLock-backspace: *del_next_word
-      CapsLock-t: *del_next_word
       # Gnome terminal implements scroll using Ctrl-Shift-Up/down
       CapsLock-w: C-Shift-Up
       CapsLock-z: C-Shift-Down
@@ -183,8 +188,8 @@ keymap:
       # Repeat-find
       CapsLock-l: [{set_mark: false}, F3]    # re-find
       # Delete next word, including trailing space.
-      CapsLock-t: [{set_mark: false}, C-delete ]
-      CapsLock-backspace: [{set_mark: false}, C-Delete ]
+      CapsLock-backspace: *del_next_word
+      CapsLock-t: *del_next_word
 
       # Scroll up/down. Most apps don't implement Ctrl-Up/Down
       # The following complex command could be simply 'xdotool click 4'
