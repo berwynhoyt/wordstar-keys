@@ -9,10 +9,6 @@
 
 # If you have problems, print keystrokes by running with: RUST_LOG=debug xremap wordstar.yml
 
-# Bouncekeys note: this has been optimised to work with bouncekeys by avoiding
-# key sequences that output repetitions of the same keystroke as bouncekeys suppress
-# such keys (even control keys) iff bouncekeys is enabled after xremap is run.
-
 # The following makes it work in wayland and in whatsapp web in chrome/firefox/ferdium
 keypress_delay_ms: 20
 
@@ -20,6 +16,14 @@ virtual_modifiers:
   - CapsLock
 
 shared:
+  # Workaround if you use bouncekeys: you will need to increase the following sleep time
+  # in ms to be larger than your bouncekeys delay in order for some mappings to work.
+  # (In Linux Mint, bouncekeys is in accessibility/typing and each slider 'notch' is 10ms.)
+  # This is because these key sequences output repetitions of the same keystroke (most
+  # notably Ctrl and Shift) which bouncekeys suppresses. Note that the problem only occurs
+  # when bouncekeys is enabled after xremap is run.
+  sleep: &sleep {sleep: 0}  # set to longer than your bouncekeys delay
+
   word_right: &word_right [{with_mark: C-right}, {with_mark: right}]
   # Note: to make del_next_word work the same on bash command line (to delete trailing spaces), put this in ~/.inputrc:
     # Make Ctrl-right (forward word) also skip space
@@ -28,8 +32,8 @@ shared:
     # Works everwhere except at end of command line:
     # "\e[3;5~": " \e[1;5C\e\C-h\C-?"
   del_next_word: &del_next_word [{set_mark: false}, C-delete]
-  # the following del_next_word doesn't work well with bouncekeys, but otherwise does work better in Chrome, google docs, etc.
-  del_next_word2: &del_next_word2 [{set_mark: false}, C-shift-right, C-shift-right, C-shift-left, control_L, control_L, delete] # 'control_L' necessary for a delay in some apps
+  # the following version deletes trailing space even in Chrome, Firefox, google docs, etc.
+  del_next_word2: &del_next_word2 [{set_mark: false}, C-shift-right, *sleep, C-shift-right, *sleep, C-shift-left, delete]
 
 keymap:
   # ~~~~ app-specific overrides must go first before the default key definitions
@@ -66,6 +70,13 @@ keymap:
       CapsLock-backspace: *del_next_word2
       CapsLock-t: *del_next_word2
 
+  - name: google-calendar
+    window:
+      only: [/Google Calendar -.*/]
+    remap:
+      CapsLock-s: p
+      CapsLock-d: n
+
   - name: scroll-override-app-specific
     # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll
     application:
@@ -73,10 +84,9 @@ keymap:
         - scite.Scite
         - code.Code
     remap:
-      # Note the following 'leftctrl' is a workaround so that keyrepeat works even with bouncekeys turned on,
-      # but note that with the keypress_delay_ms set as above, it does slow down the key repeat
-      CapsLock-w: [C-Up, leftctrl]      # Scroll up
-      CapsLock-z: [C-Down, leftctrl]    # Scroll down
+      # Note: the following sleep is so that keyrepeat works even with bouncekeys turned on
+      CapsLock-w: [C-Up, *sleep]      # Scroll up
+      CapsLock-z: [C-Down, *sleep]    # Scroll down
 
   - name: disable-esc-in-flameshot
     # disable <Esc> in flameshot because it always exits accidentally. Instead make it switch to selection mode.
@@ -148,16 +158,23 @@ keymap:
       CapsLock-l: [{set_mark: false}, Esc, C-Shift-f]  # Repeat search in libreoffice
       Ctrl-Shift-8: [Ctrl-Alt-8] # Libreoffice doesn't recognise Ctrl-Shift-8 in Linux so assign it to some other key so that I can assign it in Libreoffice
 
+  # Note: the following are unrelated to wordstar but included here for the author's own convenience. Feel free to remove them.
+
   - name: highlight-hotkey-in-calibre-ebook-reader
     application:
       only: calibre-ebook-viewer.calibre
     remap:
       CapsLock-h: [h, C-Enter]
 
+  - name: Make ferdium quit key (^Q) perform hide (^W)
+    application:
+      only: Ferdium               # name in both Wayland and X11
+    remap:
+      C-q: C-w
+
   # ~~~~ Now for the main key definitions
   - name: Main-Wordstar-Keys
     remap:
-      space: space
       # Remove mark if switching out of this app where it might cause problems
       Alt-tab: [{set_mark: false}, Alt-tab]
 
