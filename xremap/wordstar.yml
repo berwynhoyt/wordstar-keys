@@ -15,6 +15,14 @@ keypress_delay_ms: 20
 virtual_modifiers:
   - CapsLock
 
+#~ modmap:
+#~   - name: unbounce # prevent spacebar bounce from emitting two spaces
+#~     remap:
+#~       space:
+#~         skip_key_event: true
+#~         press: [space, {sleep: 60}]
+#~         release: null
+
 shared:
   # Workaround if you use bouncekeys: you will need to increase the following sleep time
   # in ms to be larger than your bouncekeys delay in order for some mappings to work.
@@ -175,6 +183,13 @@ keymap:
   # ~~~~ Now for the main key definitions
   - name: Main-Wordstar-Keys
     remap:
+      # The following debounces my spacebar which has a mechanical problem where it often sends out two keystrokes
+      # It has the drawback that space comes out 125ms late if no other key is pushed first, but it works
+      space:
+        remap:
+          space: null
+        timeout_key: space
+        timeout_millis: 125
       # Remove mark if switching out of this app where it might cause problems
       Alt-tab: [{set_mark: false}, Alt-tab]
 
