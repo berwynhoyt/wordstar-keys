@@ -15,10 +15,10 @@ echo
 # List latest xremap versions for optional installation
 installed=
 echo "Listing latest xremap binaries for you to install"
-curl -s https://api.github.com/repos/k0kubun/xremap/releases/latest >xremaps.xml
+curl -sL https://api.github.com/repos/k0kubun/xremap/releases/latest >xremaps.xml
 options=$(sed -nE "/name/s/.*\"(xremap.*zip)\".*/\1/p" xremaps.xml)
 nl <<<"$options"
-read -p "Which binary of xremap should I install in your system (Esc to skip)? " -n1 selection
+read -p "Which binary of xremap should I install in your system (Esc to skip)? " selection
 echo
 if [[ "$selection" =~ ^[0-9]$ ]]; then
   binary_name=$(sed -n ${selection}p <<<"$options")
