@@ -158,7 +158,7 @@ keymap:
       CapsLock-l: [{set_mark: false}, Esc, C-Shift-f]  # Repeat search in libreoffice
       Ctrl-Shift-8: [Ctrl-Alt-8] # Libreoffice doesn't recognise Ctrl-Shift-8 in Linux so assign it to some other key so that I can assign it in Libreoffice
 
-  # Note: the following are unrelated to wordstar but included here for the author's own convenience. Feel free to remove them.
+# ~~~~ Note: the following are unrelated to wordstar but included here for the author's own convenience. Feel free to remove them.
 
   - name: highlight-hotkey-in-calibre-ebook-reader
     application:
@@ -172,7 +172,7 @@ keymap:
     remap:
       C-q: C-w
 
-  # ~~~~ Now for the main key definitions
+# ~~~~ Now for the main key definitions
   - name: Main-Wordstar-Keys
     remap:
       # Remove mark if switching out of this app where it might cause problems
