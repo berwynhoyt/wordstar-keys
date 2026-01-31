@@ -13,7 +13,6 @@ echo "User $(whoami) is now set up."
 echo
 
 # List latest xremap versions for optional installation
-installed=
 echo "Listing latest xremap binaries for your system"
 curl -sL https://api.github.com/repos/k0kubun/xremap/releases/latest >xremaps.json
 options=$(sed -nE "/name/s/.*\"(xremap.*zip)\".*/\1/p" xremaps.json | grep "\-$(uname --machine)-")
@@ -21,18 +20,17 @@ nl <<<"$options"
 echo "There is a key that interprets these options at: https://github.com/xremap/xremap#installation"
 read -p "Which xremap binary should I install that matches your window manager (Esc to skip)? " selection
 echo
-if [[ "$selection" =~ "^[0-9]+$" ]]; then
+if [[ "$selection" =~ ^[0-9]+$ ]]; then
   binary_name=$(sed -n ${selection}p <<<"$options")
-  echo "Downloading and installing $binary"
+  [ "$binary_name" == "" ] && { echo "Could not find binary for selection $selection"; exit 1; }
+  echo "Downloading and installing $binary_name"
   binary_url=$(sed -nE "s/.*browser_download_url.*(https.*$binary_name)\".*/\1/p" xremaps.json)
   curl -fSLO $binary_url
   unzip -o $binary_name
   rm $binary_name
 
   echo "Copying xremap to $exec_dest"
-  systemctl --user stop xremap &>/dev/null
   sudo install -D xremap "$exec_dest"
-  installed=true
 else
   exec_dest="$(which xremap)"
 fi
@@ -70,19 +68,27 @@ fi
 
 # Check if service is installed
 if [[ -f "$service_file" ]]; then
+  echo "Enabling service for next boot"
   systemctl --user enable xremap  # for next boot
-  systemctl --user start xremap
   echo
   echo "Service enabled. You can now start/stop/check the service by typing:"
-  echo "  systemctl --user start|stop|status xremap"
+  echo "  systemctl --user restart|stop|status xremap"
   echo "or view the log with:"
   echo "  journalctl --user -fu xremap"
-  echo "Note: changes to keymap at ~/.config/xremap/wordstar.yml will take effect immediately"
+fi
+
+if systemctl --user --quiet is-enabled xremap; then
+  echo "(Re)starting service"
+  systemctl --user restart xremap
 fi
 
 # Warn if the xremap on the PATH is not the one I installed
-if [[ "$installed" != "" && "$(which xremap)" != "$exec_dest" ]]; then
+if [[ "$(which xremap)" != "$exec_dest" ]]; then
   echo
   echo "*** Warning ***: The xremap on your PATH is not the same as the one I just installed in $exec_dest."
   echo "You may need to remove the one at $(which xremap)"
 fi
+
+echo
+echo "Note: Changes to keymap at ~/.config/xremap/wordstar.yml take effect immediately while the service is running."
+echo "Note: Users of some window managers find they need to restart Linux before this service works."
