@@ -6,8 +6,12 @@
 
 # To discover application names, see https://github.com/k0kubun/xremap/tree/v0.8.6#x11-1
 #  On X11, run: wmctrl -xl
-
+#
 # If you have problems, print keystrokes by running with: RUST_LOG=debug xremap wordstar.yml
+
+# Prevent re-loading config from failing and leaving config unloaded
+# Requires xremap >= 0.15.1
+config_watch_debounce_ms: 100
 
 # The following makes it work in wayland and in whatsapp web in chrome/firefox/ferdium
 keypress_delay_ms: 20
