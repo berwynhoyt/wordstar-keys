@@ -4,8 +4,7 @@
 # See here for all standard wordstar key bindings:
 #   http://www.wordstar.org/index.php/wsemu-documentation/wsemu-commands-and-menus/1-wordstar-emulator-full-version-command-list
 
-# To discover application names, see https://github.com/k0kubun/xremap/tree/v0.8.6#x11-1
-#  On X11, run: wmctrl -xl
+# To discover application names: xremap --list-windows
 #
 # If you have problems, print keystrokes by running with: RUST_LOG=debug xremap wordstar.yml
 
@@ -103,8 +102,6 @@ keymap:
     application:
       only: [gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     remap:
-      CapsLock-s: C-b      # bind these to emacs keys which work better than arrows in tcsh's readline
-      CapsLock-d: C-f
       C-v: C-Shift-v  # add Ctrl-v paste as well as gnome-terminal default of C-Shift-v
       C-Alt-v: C-v    # but make C-Alt-v do what C-v used to do (quoted-insert)
       # Make Ctrl-tab and Ctrl-shift-tab switch tabs in Gnome terminal
