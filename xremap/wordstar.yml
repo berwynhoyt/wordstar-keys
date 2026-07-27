@@ -43,8 +43,8 @@ keymap:
   # You can discover app names to use below using the instructions for your OS (see link above)
 
   - name: Make Zoho Mail keys more compatible with Gmail
-    application:
-      only: Zoho Mail - Desktop
+    window:
+      only: [/Zoho Mail/]
     remap:
       C-w: C-Backslash  # close tab
       C-Shift-8: C-dot  # bullets
@@ -96,11 +96,11 @@ keymap:
     application:
       only: flameshot
     remap:
-      Esc: [a, s, s]           # delete whole line like in windows
+      Esc: [a, s, s]
 
   - name: scroll-override-Gnome-terminal
     application:
-      only: [gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
+      only: [kitty, gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     remap:
       C-v: C-Shift-v  # add Ctrl-v paste as well as gnome-terminal default of C-Shift-v
       C-Alt-v: C-v    # but make C-Alt-v do what C-v used to do (quoted-insert)
@@ -112,7 +112,6 @@ keymap:
       CapsLock-z: C-Shift-Down
       # specific key maps that work in readline (e.g. bash)
       CapsLock-y: C-k  # del end-of-line; (non-wordstar: in ws it deletes the whole line)
-      Esc: [Home, C-k]     # delete whole line like in windows
       CapsLock-k:
         # readline-specific (e.g. bash) block marking
         # NOTE: requires that you put the line 'C-h: kill-region' in your ~/.inputrc (or run 'bind C-h:kill-region')
@@ -151,6 +150,18 @@ keymap:
           # Goto line
           j: C-g  # non-wordstar
 
+  - name: kitty overrides
+    application:
+      only: [kitty]
+    remap:
+      CapsLock-y: C-k  # del end-of-line; (non-wordstar: in ws it deletes the whole line)
+
+  - name: claude overrides
+    application: kitty
+    window: /^✳ /  # That's a special unicode star (not an asterisk) that every claude window title starts with
+    remap:
+      CapsLock-backspace: [C-right, C-w]
+      C-delete: [C-right, C-w]
 
   - name: repeat-search-libreoffice
     application:
