@@ -157,7 +157,8 @@ keymap:
       CapsLock-y: C-k  # del end-of-line; (non-wordstar: in ws it deletes the whole line)
 
   - name: claude overrides
-    application: kitty
+    application:
+      only: [kitty, gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     window: /^✳ /  # That's a special unicode star (not an asterisk) that every claude window title starts with
     remap:
       CapsLock-backspace: [C-right, C-w]
