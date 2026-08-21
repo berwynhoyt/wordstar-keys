@@ -160,7 +160,7 @@ keymap:
     application:
       only: [kitty, gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     window:
-      only: ["/^[✳⠐⠂] /"]  # special unicode chars claude window titles starts with when thinking (⠐ or ⠂) or not (✳ - not an asterisk).
+      only: ["/^[✳⠐⠂◑◐] /"]  # special unicode chars claude window titles starts with when thinking (⠐ or ⠂) or not (✳ - not an asterisk).
     remap:
       CapsLock-backspace: [C-right, C-w]
       C-delete: [C-right, C-w]
