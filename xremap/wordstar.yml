@@ -60,7 +60,8 @@ keymap:
     application:
       only:
         - Google-chrome         # name in both Wayland and X11
-        - Ferdium               # name in both Wayland and X11
+        - ferdium               # name in both Wayland and X11
+        - Ferdium               # old name in both Wayland and X11
         - firefox               # name in both Wayland and X11
         - Typora                # name in both Wayland and X11
         - Xed                   # name in both Wayland and X11
@@ -182,7 +183,9 @@ keymap:
 
   - name: Make ferdium quit key (^Q) perform hide (^W)
     application:
-      only: Ferdium               # name in both Wayland and X11
+      only:
+        - ferdium               # name in both Wayland and X11
+        - Ferdium               # Old name in both Wayland and X11
     remap:
       C-q: C-w
 
