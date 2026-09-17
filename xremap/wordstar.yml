@@ -85,7 +85,8 @@ keymap:
     # Some apps implement scroll on Ctrl-Up/Down keys. Use those, if possible, to get a more controlled single-line scroll
     application:
       only:
-        - scite.Scite
+        - SciTE     # name in X11
+        - scite     # old name in X11
         - code.Code
     remap:
       # Note: the following sleep is so that keyrepeat works even with bouncekeys turned on
