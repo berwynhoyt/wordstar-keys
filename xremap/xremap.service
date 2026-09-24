@@ -1,15 +1,18 @@
 [Unit]
 Description=xremap - wordstar keys
 PartOf=graphical-session.target
-Wants=xdg-desktop-autostart.target
-After=xdg-desktop-autostart.target
 
 [Service]
 Type=simple
 Restart=always
+# Space out restarts so a crash loop doesn't trip systemd's start limit and give up
+RestartSec=2
+Environment=DISPLAY=:0 XAUTHORITY=%h/.Xauthority
+# Wait until the X server accepts connections, since window/application rules need it
+ExecStartPre=/bin/sh -c 'until xset q >/dev/null 2>&1; do sleep 1; done'
 # prevent logging every single key to clog up the syslog
 StandardError=null
-ExecStart=xremap --watch=config %h/.config/xremap/wordstar.yml
+ExecStart=/usr/local/bin/xremap --watch=config %h/.config/xremap/wordstar.yml
 
 [Install]
 WantedBy=default.target
