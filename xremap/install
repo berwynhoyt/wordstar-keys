@@ -18,7 +18,7 @@ curl -sL https://api.github.com/repos/k0kubun/xremap/releases/latest >xremaps.js
 options=$(sed -nE "/name/s/.*\"(xremap.*zip)\".*/\1/p" xremaps.json | grep "\-$(uname --machine)-")
 nl <<<"$options"
 echo "There is a key that interprets these options at: https://github.com/xremap/xremap#installation"
-read -p "Which xremap binary should I install that matches your window manager (Esc to skip)? " selection
+read -p "Which xremap binary should I install that matches your window manager (Esc+Enter to skip)? " selection
 echo
 if [[ "$selection" =~ ^[0-9]+$ ]]; then
   binary_name=$(sed -n ${selection}p <<<"$options")
