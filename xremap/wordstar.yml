@@ -195,6 +195,8 @@ keymap:
     remap:
       # Remove mark if switching out of this app where it might cause problems
       Alt-tab: [{set_mark: false}, Alt-tab]
+      Sysrq: {launch: ['flameshot', 'gui']}
+      Shift-Super-s: {launch: ['flameshot', 'gui']}
 
       # Cursor
       CapsLock-s: {with_mark: left}
