@@ -100,6 +100,24 @@ keymap:
     remap:
       Esc: [a, s, s]
 
+  - name: tig
+    application:
+      only: [kitty]  # names in Wayland and X11, respectively
+    window:
+      only: ["/^tig$/"]
+    remap:
+      CapsLock-w: C-y
+      CapsLock-z: C-e
+
+  - name: claude overrides
+    application:
+      only: [kitty, gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
+    window:
+      only: ["/^[✳⠐⠂◑◐] /"]  # special unicode chars claude window titles starts with when thinking (⠐ or ⠂) or not (✳ - not an asterisk).
+    remap:
+      CapsLock-backspace: [C-right, right, C-w]
+      C-delete: [C-right, right, C-w]
+
   - name: scroll-override-Gnome-terminal
     application:
       only: [kitty, gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
@@ -151,21 +169,6 @@ keymap:
           u: [{set_mark: false}, C-z]
           # Goto line
           j: C-g  # non-wordstar
-
-  - name: kitty overrides
-    application:
-      only: [kitty]
-    remap:
-      CapsLock-y: C-k  # del end-of-line; (non-wordstar: in ws it deletes the whole line)
-
-  - name: claude overrides
-    application:
-      only: [kitty, gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
-    window:
-      only: ["/^[✳⠐⠂◑◐] /"]  # special unicode chars claude window titles starts with when thinking (⠐ or ⠂) or not (✳ - not an asterisk).
-    remap:
-      CapsLock-backspace: [C-right, C-w]
-      C-delete: [C-right, C-w]
 
   - name: repeat-search-libreoffice
     application:
