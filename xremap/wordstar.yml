@@ -100,7 +100,7 @@ keymap:
     remap:
       Esc: [a, s, s]
 
-  - name: tig
+  - name: tig        # only works for tig in kitty which puts the command name in the window title
     application:
       only: [kitty]  # names in Wayland and X11, respectively
     window:
@@ -118,7 +118,7 @@ keymap:
       CapsLock-backspace: [C-right, right, C-w]
       C-delete: [C-right, right, C-w]
 
-  - name: scroll-override-Gnome-terminal
+  - name: terminal-overrides
     application:
       only: [kitty, gnome-terminal-server, Gnome-terminal]  # names in Wayland and X11, respectively
     remap:
@@ -169,6 +169,7 @@ keymap:
           u: [{set_mark: false}, C-z]
           # Goto line
           j: C-g  # non-wordstar
+      BTN_MIDDLE: [BTN_MIDDLE, Space]  # Paste with space after it in terminal
 
   - name: repeat-search-libreoffice
     application:
