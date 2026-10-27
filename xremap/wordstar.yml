@@ -58,15 +58,15 @@ keymap:
     # they only move to the end of the current word, before the space
     # this makes them consistent with most editors and word-processors
     application:
-      only:
-        - Google-chrome         # name in both Wayland and X11
-        - ferdium               # name in both Wayland and X11
-        - Ferdium               # old name in both Wayland and X11
-        - firefox               # name in both Wayland and X11
-        - Typora                # name in both Wayland and X11
-        - Xed                   # name in both Wayland and X11
-        - Zotero
-        - Zoho Mail - Desktop
+      only: [  # old/new name in both Wayland and X11
+        Google-chrome,
+        Ferdium, ferdium,
+        firefox,
+        Typora, typora,
+        Xed,
+        Zotero,
+        Zoho Mail - Desktop,
+        ]
     remap:
       CapsLock-f: *word_right
       #Delete-next-word (incuding trailing space).
